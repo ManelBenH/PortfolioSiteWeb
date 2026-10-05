@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio — Manel Ben Halima</title>
+<meta name="description" content="Portfolio de Manel Ben Halima, designer graphique &amp; motion designer basée à Montréal, en transition vers le développement front-end.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Hachi+Maru+Pop&display=swap" rel="stylesheet">
+
+<style>
+  /* ---------- Design tokens ---------- */
+  :root {
+    --sidebar-w: 64px;
+    --bg: #ffffff;
+    --bg-raised: #F5F5F1;
+    --ink: #1B1D1B;
+    --ink-soft: #55584f;
+    --line: rgba(27, 29, 27, 0.14);
+    --accent: #3B2FE0;
+    --font-display: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    --font-body: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+  h1, h2, h3 { font-family: var(--font-display); margin: 0; letter-spacing: -0.01em; }
+  p { margin: 0; }
+  button { font: inherit; color: inherit; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .skip-link {
+    position: absolute;
+    left: -999px;
+    top: 0;
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 16px;
+    z-index: 300;
+  }
+  .skip-link:focus {
+    left: var(--sidebar-w);
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--sidebar-w);
+    border-right: 1px solid var(--line);
+    background: var(--bg);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+  }
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 22px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .hamburger span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: var(--ink);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .hamburger.is-open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .hamburger.is-open span:nth-child(2) { opacity: 0; }
+  .hamburger.is-open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  .vlabel, .vname, .year {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+  }
+  .vlabel { font-size: 0.7rem; letter-spacing: 0.08em; color: var(--ink-soft); }
+  .vname { font-family: var(--font-display); font-weight: 600; font-size: 0.85rem; }
+  .year { font-size: 0.68rem; color: var(--ink-soft); }
+  .mid-stack { display: flex; flex-direction: column; align-items: center; gap: 28px; text-decoration: none; }
+
+  /* ---------- Menu overlay ---------- */
+  .menu-overlay {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    left: var(--sidebar-w);
+    background: var(--ink);
+    color: var(--bg);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 28px 5vw;
+    transform: translateY(-100%);
+    transition: transform 0.45s cubic-bezier(.2,.7,.2,1);
+  }
+  .menu-overlay.is-open { transform: translateY(0); }
+
+  .menu-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .menu-top .brand { font-family: var(--font-display); font-size: 0.85rem; opacity: 0.7; }
+  .menu-close { background: none; border: none; color: inherit; font-size: 0.85rem; letter-spacing: 0.08em; cursor: pointer; }
+
+  .menu-nav { display: flex; flex-direction: column; gap: 6px; }
+  .menu-link {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    text-decoration: none;
+    opacity: 0.4;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2rem, 8vw, 4.4rem);
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+    transition: opacity 0.2s ease;
+  }
+  .menu-link .idx { font-size: clamp(0.85rem, 1.6vw, 1.1rem); font-weight: 500; opacity: 0.7; }
+  .menu-link:hover, .menu-link:focus-visible, .menu-link.is-active { opacity: 1; }
+
+  .menu-bottom { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; font-size: 0.85rem; }
+  .menu-bottom .copy { opacity: 0.6; }
+  .socials { display: flex; gap: 20px; }
+  .socials a { text-decoration: none; opacity: 0.75; }
+  .socials a:hover, .socials a:focus-visible { opacity: 1; }
+
+  /* ---------- Layout ---------- */
+  .page { margin-left: var(--sidebar-w); }
+  section { padding: 96px 6vw; }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; margin-bottom: 48px; flex-wrap: wrap; }
+  .section-num { font-family: var(--font-display); font-size: 0.85rem; color: var(--ink-soft); }
+  .section-title { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 600; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    padding: 6vw;
+  }
+  .hero-eyebrow { font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+  .hero-role {
+    font-size: clamp(2.6rem, 9vw, 6.5rem);
+    font-weight: 700;
+    color: var(--accent);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .hero-role.is-swapping { opacity: 0; transform: translateY(-10px); }
+  .hero-sub { max-width: 46ch; font-size: 1.05rem; color: var(--ink-soft); }
+
+  /* ---------- About ---------- */
+  .about-text { max-width: 62ch; font-size: 1.15rem; color: var(--ink-soft); }
+  .about-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 28px;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding-bottom: 6px;
+    width: fit-content;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .about-more .arrow { transition: transform 0.2s ease; }
+  .about-more:hover, .about-more:focus-visible { color: var(--accent); border-color: var(--accent); }
+  .about-more:hover .arrow, .about-more:focus-visible .arrow { transform: translateX(6px); }
+
+  /* ---------- Travaux ---------- */
+  .work-group { margin-bottom: 72px; }
+  .work-group:last-child { margin-bottom: 0; }
+  /* Titre de groupe au-dessus des cartes : grand titre en gras, sous-titre en petit juste en dessous */
+  .work-group-head { margin-bottom: 28px; }
+  .work-group-title,
+  .work-group-title a {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .work-group-name { font-size: 2.6rem; font-weight: 700; line-height: 0.9; }
+  .work-group-sub { font-size: 0.8rem; font-weight: 500; }
+  .work-group-title a { color: inherit; text-decoration: none; transition: color 0.2s ease; }
+  .work-group-title a:hover, .work-group-title a:focus-visible { color: var(--accent); }
+
+  .acc-art--reveal { position: relative; background: #14100e; align-items: center; justify-content: center; }
+  .acc-art__photo {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1);
+    transition: transform 400ms ease;
+    z-index: 0;
+  }
+  .acc-panel:hover .acc-art__photo,
+  .acc-panel.is-open .acc-art__photo { transform: scale(1.05); }
+  .acc-art__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .acc-art__logo { width: 250px; height: 250px; display: block; }
+
+  /* ---------- Accordion (groupe A) ---------- */
+.accordion {
+  display: flex;
+  height: min(56vh, 460px);
+  min-height: 320px;
+  gap: 0;
+}
+.acc-panel {
+  position: relative;
+  flex: 1;
+  min-width: 56px;
+  overflow: hidden;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: flex 620ms cubic-bezier(.22,.61,.36,1);
+}
+.accordion:hover .acc-panel { flex: 1; }
+.accordion .acc-panel:hover,
+.accordion .acc-panel:focus-visible { flex: 3.2; }
+
+.acc-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.acc-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.05) 55%, rgba(0,0,0,0.72) 100%);
+  pointer-events: none;
+}
+
+.acc-index {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.8);
+  z-index: 2;
+}
+
+.acc-label {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 16px;
+  z-index: 2;
+  white-space: nowrap;
+}
+.acc-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #fff;
+  margin: 0 0 6px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 380ms ease, transform 380ms ease;
+}
+.acc-caption {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.82);
+  white-space: normal;
+  max-width: 260px;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 380ms ease 60ms, transform 380ms ease 60ms;
+}
+.acc-panel:focus-visible .acc-title,
+.acc-panel:focus-visible .acc-caption,
+.acc-panel:hover .acc-title,
+.acc-panel:hover .acc-caption,
+.acc-panel.is-open .acc-title,
+.acc-panel.is-open .acc-caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .accordion { flex-direction: column; height: auto; width: 100%; }
+  .work-group-name { font-size: 1.8rem; }
+  .acc-panel { flex: none !important; width: 100%; min-width: 0; height: 64px; transition: height 550ms cubic-bezier(.22,.61,.36,1); }
+  .acc-panel:hover,
+  .acc-panel.is-open { height: 280px; }
+  .acc-label { white-space: normal; }
+  .acc-caption { max-width: 100%; }
+}
+
+/* Placeholders "Visuel à ajouter" (groupes B & C, en attendant les vrais visuels) */
+.acc-art.placeholder { align-items: center; justify-content: center; }
+.placeholder-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+}
+.ph-navy { background: linear-gradient(160deg, #16233a 0%, #060a12 100%); }
+.ph-violet { background: linear-gradient(160deg, #2a1f3d 0%, #120d1c 100%); }
+.ph-anthracite { background: linear-gradient(160deg, #2c2e30 0%, #16171a 100%); }
+
+  /* ---------- Contact ---------- */
+  #contact { min-height: 80dvh; display: flex; flex-direction: column; justify-content: center; }
+  .contact-grid { display: flex; flex-wrap: wrap; gap: 48px; justify-content: space-between; }
+  .contact-text { max-width: 46ch; color: var(--ink-soft); font-size: 1.05rem; }
+  .contact-links { display: flex; flex-direction: column; gap: 14px; font-family: var(--font-display); font-size: 1.15rem; }
+  .contact-links a { text-decoration: none; padding-bottom: 4px; width: fit-content; }
+  .contact-links a:hover, .contact-links a:focus-visible { border-color: var(--accent); color: var(--accent); }
+  .btn-cv {
+    margin-top: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    border: 1px solid var(--ink);
+    background: none;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 600;
+    width: fit-content;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .btn-cv:hover, .btn-cv:focus-visible { background: var(--ink); color: var(--bg); }
+
+  /* ---------- Footer ---------- */
+  .site-footer { background: var(--bg-raised); min-height: 80dvh; display: flex; flex-direction: column; justify-content: space-between; padding: 72px 6vw 40px; border-bottom: none; }
+  .footer-top { display: flex; justify-content: flex-end; }
+  .footer-cols { display: flex; gap: 56px; flex-wrap: wrap; }
+  .footer-col { display: flex; flex-direction: column; gap: 10px; }
+  .col-label { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 4px; }
+  .footer-col a { text-decoration: none; font-size: 0.95rem; }
+  .footer-col a:hover, .footer-col a:focus-visible { color: var(--accent); }
+  .footer-credit { font-size: 0.8rem; color: var(--ink-soft); text-align: right; margin-top: 28px; }
+  .footer-giant {
+    font-family: 'Hachi Maru Pop', var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.2rem, 10vw, 7.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    margin-top: 0;
+    margin-bottom: clamp(24px, 6vw, 80px);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    section { padding: 64px 6vw; }
+  }
+</style>
+<link rel="stylesheet" href="tv-noise.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Aller au contenu</a>
+
+  <aside class="sidebar">
+    <button class="hamburger" id="menuToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="menuOverlay">
+      <span></span><span></span><span></span>
+    </button>
+    <a class="mid-stack" href="#accueil" aria-label="Retour à l'accueil">
+      <span class="vlabel">PORTFOLIO</span>
+      <span class="vname">MANEL BEN HALIMA</span>
+    </a>
+    <span class="year">© 2026</span>
+  </aside>
+
+  <nav class="menu-overlay" id="menuOverlay" aria-hidden="true">
+    <div class="menu-top">
+      <span class="brand">Manel Ben Halima</span>
+      <button class="menu-close" id="menuClose">FERMER</button>
+    </div>
+    <div class="menu-nav">
+      <a href="#apropos" class="menu-link" data-section="apropos"><span class="idx">01</span>À propos</a>
+      <a href="#travaux" class="menu-link" data-section="travaux"><span class="idx">02</span>Travaux</a>
+      <a href="#contact" class="menu-link" data-section="contact"><span class="idx">03</span>Contact</a>
+    </div>
+    <div class="menu-bottom">
+      <span class="copy">Basée à Montréal</span>
+      <div class="socials">
+        <a href="https://www.linkedin.com/in/manel-ben-halima" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.behance.net/mmanelben" target="_blank" rel="noopener">Behance</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="page" id="main">
+
+    <section class="hero" id="accueil">
+      <span class="hero-eyebrow">Manel Ben Halima — Montréal</span>
+      <h1 class="hero-role" id="heroRole" aria-live="polite">Graphic designer</h1>
+      <p class="hero-sub">Designer graphique &amp; motion designer, en transition vers le développement front-end pour élargir sa palette d'outils.</p>
+    </section>
+
+    <section id="apropos">
+      <div class="section-head">
+        <span class="section-num">01 — À propos</span>
+      </div>
+      <h2 class="section-title" style="margin-bottom: 28px;">Passionnée de design depuis près de dix ans</h2>
+      <p class="about-text">Tout a commencé avec un diplôme en design obtenu en 2016. Depuis, je n’ai jamais vraiment arrêté de créer, d’animer et de recommencer. Un logo qui prend vie, une charte qui tient debout, une animation qui donne le rythme juste : c'est ce langage-là que je parle le mieux. J’ajoute aujourd’hui une nouvelle corde à mon arc, le code, en particulier le HTML, le CSS et le JavaScript, pour élargir ma vision et rester polyvalente. Je suis actuellement à la recherche d’un emploi en développement Web et en création de contenu numérique, où je pourrai mettre à profit ma créativité et mes compétences techniques.</p>
+      <a class="about-more" href="apropos.html">
+        <span>Plus d'informations</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </section>
+
+    <section id="travaux">
+      <div class="section-head">
+        <span class="section-num">02 — Travaux</span>
+      </div>
+
+      <div class="work-group">
+  <div class="work-group-head">
+    <h3 class="work-group-title"><a href="graphique-portfolio-final.html"><span class="work-group-name">Graphique</span><span class="work-group-sub">identités visuelles, print, campagnes</span></a></h3>
+  </div>
+
+  <div class="accordion" id="accGraphique">
+
+    <a href="graphique-portfolio-final.html#project-0" class="acc-panel" data-project="01">
+      <div class="acc-art acc-art--reveal">
+        <div class="acc-art__photo" style="background-image: url('images/couverture-G-1.webp');"></div>
+        <div class="acc-art__content">
+          <img src="images/logo-pure-wine.svg" alt="Pure Wine" class="acc-art__logo" loading="lazy">
+        </div>
+      </div>
+      <div class="acc-shade"></div>
+      <span class="acc-index">01</span>
+      <div class="acc-label">
+        <h4 class="acc-title">Pure Wine</h4>
+        <p class="acc-caption">Identité de marque et univers visuel pour une cave à vin nature</p>
+      </div>
+    </a>
+
+    <a href="graphique-portfolio-final.html#project-1" class="acc-panel" data-project="02">
+      <div class="acc-art acc-art--reveal">
+        <div class="acc-art__photo" style="background-image: url('images/couverture-G-2.webp');"></div>
+        <div class="acc-art__content">
+          <img src="images/logo-Pavillon.svg" alt="Pavillon" class="acc-art__logo" loading="lazy">
+        </div>
+      </div>
+      <div class="acc-shade"></div>
+      <span class="acc-index">02</span>
+      <div class="acc-label">
+        <h4 class="acc-title">Pavillon</h4>
+        <p class="acc-caption">Identité visuelle et signalétique pour un pavillon d'exposition</p>
+      </div>
+    </a>
+
+    <a href="graphique-portfolio-final.html#project-2" class="acc-panel" data-project="03">
+      <div class="acc-art acc-art--reveal">
+        <div class="acc-art__photo" style="background-image: url('images/image-de-fond-jardin-interieur.webp');"></div>
+        <div class="acc-art__content">
+          <img src="images/logo-jardins-inter.svg" alt="Jardins Intérieurs" class="acc-art__logo" loading="lazy">
+        </div>
+      </div>
+      <div class="acc-shade"></div>
+      <span class="acc-index">03</span>
+      <div class="acc-label">
+        <h4 class="acc-title">Jardins Intérieurs</h4>
+        <p class="acc-caption">Identité visuelle pour un concept-store végétal</p>
+      </div>
+    </a>
+    <a href="graphique-portfolio-final.html#project-3" class="acc-panel" data-project="04">
+      <div class="acc-art acc-art--reveal">
+        <div class="acc-art__photo" style="background-image: url('images/image-de-fond-sommet.webp');"></div>
+        <div class="acc-art__content">
+          <img src="images/logo-sommet.svg" alt="Sommet" class="acc-art__logo" loading="lazy">
+        </div>
+      </div>
+      <div class="acc-shade"></div>
+      <span class="acc-index">04</span>
+      <div class="acc-label">
+        <h4 class="acc-title">Sommet</h4>
+        <p class="acc-caption">Identité de marque pour une expédition en haute montagne</p>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+      <div class="work-group">
+        <div class="work-group-head">
+          <h3 class="work-group-title"><span class="work-group-name">Motion design</span><span class="work-group-sub">animations, génériques</span></h3>
+        </div>
+
+        <div class="accordion" id="accMotion">
+
+          <a href="motion-P1.html" class="acc-panel" data-project="motion-01">
+            <div class="acc-art acc-art--reveal">
+              <div class="acc-art__photo" style="background-image: url('images/motion-image-de-fond-sommet.webp');"></div>
+              <div class="acc-art__content">
+                <!-- logo à venir -->
+              </div>
+            </div>
+            <div class="acc-shade"></div>
+            <span class="acc-index">01</span>
+            <div class="acc-label">
+              <h4 class="acc-title">Sommet</h4>
+              <p class="acc-caption">Générique animé et déclinaisons motion de l'identité</p>
+            </div>
+          </a>
+
+          <a href="projets/motion-02.html" class="acc-panel" data-project="motion-02">
+            <div class="acc-art acc-art--reveal">
+              <div class="acc-art__photo" style="background-image: url('images/motion-image-de-fond-med.webp');"></div>
+              <div class="acc-art__content">
+                <!-- logo à venir -->
+              </div>
+            </div>
+            <div class="acc-shade"></div>
+            <span class="acc-index">02</span>
+            <div class="acc-label">
+              <h4 class="acc-title">Med</h4>
+              <p class="acc-caption">Déclinaison animée d'un logo de marque</p>
+            </div>
+          </a>
+
+          <a href="projets/motion-03.html" class="acc-panel" data-project="motion-03">
+            <div class="acc-art acc-art--reveal">
+              <div class="acc-art__photo" style="background-image: url('images/motion-image-de-fond-association.webp');"></div>
+              <div class="acc-art__content">
+                <!-- logo à venir -->
+              </div>
+            </div>
+            <div class="acc-shade"></div>
+            <span class="acc-index">03</span>
+            <div class="acc-label">
+              <h4 class="acc-title">Association</h4>
+              <p class="acc-caption">Format vertical court pour les réseaux sociaux</p>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+      <div class="work-group" id="developpement">
+        <div class="work-group-head">
+          <h3 class="work-group-title"><span class="work-group-name">Développement</span><span class="work-group-sub">prototypes web/IA</span></h3>
+        </div>
+
+        <div class="accordion" id="accDev">
+
+          <a href="projet-dev.html?projet=1" class="acc-panel" aria-label="Voir le projet Les Affûtés">
+            <div class="acc-art" role="img" aria-label="Prototype web — Les Affûtés" style="background: #060a12 url('images/iMac-and-iPhone-Pro-lesAffutes-Mockup.webp') center / cover no-repeat;"></div>
+            <div class="acc-shade"></div>
+            <span class="acc-index">01</span>
+            <div class="acc-label">
+              <h4 class="acc-title">Prototype web</h4>
+              <p class="acc-caption">Landing page interactive avec micro-animations</p>
+            </div>
+          </a>
+
+          <a href="projet-dev.html?projet=2" class="acc-panel" aria-label="Voir le projet GoSec">
+            <div class="acc-art" role="img" aria-label="Expérimentation IA — GoSec" style="background: #120d1c url('images/iMac-GoSec-Mockup.webp') center / cover no-repeat;"></div>
+            <div class="acc-shade"></div>
+            <span class="acc-index">02</span>
+            <div class="acc-label">
+              <h4 class="acc-title">Expérimentation IA</h4>
+              <p class="acc-caption">Outil génératif appliqué à un besoin créatif</p>
+            </div>
+          </a>
+
+          <a href="projet-dev.html?projet=3" class="acc-panel" aria-label="Voir le projet Biblio">
+            <div class="acc-art" role="img" aria-label="Portfolio v2 — Biblio" style="background: #16171a url('images/biblio-smartphone-screen-mockup-17.webp') center / cover no-repeat;"></div>
+            <div class="acc-shade"></div>
+            <span class="acc-index">03</span>
+            <div class="acc-label">
+              <h4 class="acc-title">Portfolio v2</h4>
+              <p class="acc-caption">Ce site même, conçu et codé de zéro</p>
+            </div>
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="section-head">
+        <span class="section-num">03 — Contact</span>
+      </div>
+      <div class="contact-grid">
+        <p class="contact-text">Un projet en tête, une collaboration à discuter ou simplement envie d'échanger ? Écrivez-moi.</p>
+        <div class="contact-links">
+          <a href="mailto:mmanelbenhalima@gmail.com">mmanelbenhalima@gmail.com</a>
+          <a href="https://www.linkedin.com/in/manel-ben-halima" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="https://www.behance.net/mmanelben" target="_blank" rel="noopener">Behance</a>
+          <a class="btn-cv" href="cv.pdf" download>Télécharger mon CV</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="footer-head">
+        <div class="footer-top">
+          <div class="footer-cols">
+            <div class="footer-col">
+              <span class="col-label">Menu</span>
+              <a href="#apropos">À propos</a>
+              <a href="#travaux">Travaux</a>
+              <a href="#contact">Contact</a>
+            </div>
+            <div class="footer-col">
+              <span class="col-label">Social</span>
+              <a href="https://www.linkedin.com/in/manel-ben-halima" target="_blank" rel="noopener">LinkedIn</a>
+              <a href="https://www.behance.net/mmanelben" target="_blank" rel="noopener">Behance</a>
+              <a href="https://github.com/ManelBenH" target="_blank" rel="noopener">GitHub</a>
+            </div>
+            <div class="footer-col">
+              <span class="col-label">Mail</span>
+              <a href="mailto:mmanelbenhalima@gmail.com">mmanelbenhalima@gmail.com</a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-credit">Conçu &amp; développé par Manel Ben Halima — © 2026</div>
+      </div>
+      <div class="footer-giant">THANKYOU</div>
+    </footer>
+
+  </main>
+
+<script>
+  (function () {
+    var toggle = document.getElementById('menuToggle');
+    var closeBtn = document.getElementById('menuClose');
+    var overlay = document.getElementById('menuOverlay');
+    var links = overlay.querySelectorAll('.menu-link');
+
+    function openMenu() {
+      overlay.classList.add('is-open');
+      toggle.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+    function closeMenu() {
+      overlay.classList.remove('is-open');
+      toggle.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    toggle.addEventListener('click', function () {
+      overlay.classList.contains('is-open') ? closeMenu() : openMenu();
+    });
+    closeBtn.addEventListener('click', closeMenu);
+    links.forEach(function (link) {
+      link.addEventListener('click', closeMenu);
+    });
+
+    var sections = Array.prototype.map.call(links, function (link) {
+      return document.getElementById(link.dataset.section);
+    });
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          links.forEach(function (link) {
+            link.classList.toggle('is-active', link.dataset.section === entry.target.id);
+          });
+        });
+      }, { rootMargin: '-40% 0px -55% 0px' });
+      sections.forEach(function (section) {
+        if (section) observer.observe(section);
+      });
+    }
+  })();
+
+  (function () {
+    var roles = ['Graphic designer', 'Motion designer', 'Développeur front-end'];
+    var el = document.getElementById('heroRole');
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!el || reduceMotion) return;
+    var i = 0;
+    setInterval(function () {
+      el.classList.add('is-swapping');
+      setTimeout(function () {
+        i = (i + 1) % roles.length;
+        el.textContent = roles[i];
+        el.classList.remove('is-swapping');
+      }, 300);
+    }, 2500);
+  })();
+  
+  (function () {
+    var isTouch = window.matchMedia('(hover: none)').matches;
+    if (!isTouch) return;
+    document.querySelectorAll('.accordion').forEach(function (wrap) {
+      var panels = wrap.querySelectorAll('.acc-panel');
+      panels.forEach(function (p) {
+        p.addEventListener('click', function (e) {
+          var wasOpen = p.classList.contains('is-open');
+          if (p.tagName === 'A' && !wasOpen) { e.preventDefault(); }
+          panels.forEach(function (other) { if (other !== p) other.classList.remove('is-open'); });
+          p.classList.toggle('is-open');
+        });
+      });
+    });
+  })();
+
+</script>
+<script src="tv-noise.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+/*
+  Fond blanc + effet « TV Static Noise », partagé par toutes les pages
+  (même rendu que projet-dev.html).
+  Basé sur le travail d'anatravas — https://codepen.io/anatravas/pen/vyOwOZ — Licence MIT
+*/
+
+/* Le blanc est porté par <html> et <body> reste transparent :
+   le grain (z-index: -1) passe ainsi au-dessus du fond mais sous tout le contenu. */
+html { background: #ffffff !important; }
+body { background: transparent !important; }
+
+.tv-noise-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .6s ease;
+}
+
+.tv-noise-wrapper.is-visible {
+  opacity: 1;
+}
+
+.tv-noise {
+  position: absolute;
+  inset: -500px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2' intercept='-.5'/%3E%3CfeFuncG type='linear' slope='2' intercept='-.5'/%3E%3CfeFuncB type='linear' slope='2' intercept='-.5'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 320px 320px;
+  opacity: 0.5;
+  animation: tv-noise 3s steps(8, end) infinite both;
+  will-change: transform;
+}
+
+@keyframes tv-noise {
+  0%   { transform: translate(0, 0); }
+  10%  { transform: translate(-100px, 100px); }
+  20%  { transform: translate(150px, -100px); }
+  30%  { transform: translate(-100px, 100px); }
+  40%  { transform: translate(100px, -150px); }
+  50%  { transform: translate(-100px, 200px); }
+  60%  { transform: translate(-200px, -100px); }
+  70%  { transform: translate(50px, 100px); }
+  80%  { transform: translate(100px, -150px); }
+  90%  { transform: translate(0, 200px); }
+  100% { transform: translate(-100px, 100px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tv-noise { animation: none; }
+}

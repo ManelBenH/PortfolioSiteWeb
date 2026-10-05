@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graphique — Portfolio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --sidebar-w: 64px;
+      --bg: #ffffff;
+      --bg-raised: #F5F5F1;
+      --ink: #1B1D1B;
+      --ink-soft: #55584F;
+      --line: rgba(27, 29, 27, 0.14);
+      --accent: #3B2FE0;
+
+      --font-display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+      --font-body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+
+      --gap: clamp(24px, 5vw, 64px);
+      --page-top: clamp(40px, 8vw, 90px);
+      --sticky-top: 24px;
+      --page-head-h: 0px;
+    }
+
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      font-family: var(--font-display);
+      letter-spacing: -0.01em;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      z-index: 300;
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 16px;
+    }
+
+    .skip-link:focus {
+      left: var(--sidebar-w);
+    }
+
+    /* =========================================================
+       SIDEBAR
+       ========================================================= */
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
+
+      border-right: 1px solid var(--line);
+      background: var(--bg);
+      z-index: 50;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 20px 0;
+    }
+
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      width: 22px;
+      padding: 8px;
+
+      border: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background: var(--ink);
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    .hamburger.is-open span:nth-child(1) {
+      transform: translateY(6.5px) rotate(45deg);
+    }
+
+    .hamburger.is-open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.is-open span:nth-child(3) {
+      transform: translateY(-6.5px) rotate(-45deg);
+    }
+
+    .vlabel,
+    .vname,
+    .year {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      white-space: nowrap;
+    }
+
+    .vlabel {
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: var(--ink-soft);
+    }
+
+    .vname {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--ink);
+    }
+
+    .year {
+      font-size: 0.68rem;
+      color: var(--ink-soft);
+    }
+
+    .mid-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      text-decoration: none;
+    }
+
+    /* =========================================================
+       MENU
+       ========================================================= */
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: var(--sidebar-w);
+
+      z-index: 100;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      padding: 28px 5vw;
+
+      background: var(--ink);
+      color: var(--bg);
+
+      transform: translateY(-100%);
+      transition: transform 0.45s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    .menu-overlay.is-open {
+      transform: translateY(0);
+    }
+
+    .menu-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .menu-top .brand {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+
+    .menu-close {
+      border: 0;
+      background: none;
+      color: inherit;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+    }
+
+    .menu-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .menu-link {
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+
+      text-decoration: none;
+      opacity: 0.4;
+
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(2rem, 8vw, 4.4rem);
+      line-height: 1.05;
+
+      transition: opacity 0.2s ease;
+    }
+
+    .menu-link .idx {
+      font-size: clamp(0.85rem, 1.6vw, 1.1rem);
+      font-weight: 500;
+      opacity: 0.7;
+    }
+
+    .menu-link:hover,
+    .menu-link:focus-visible,
+    .menu-link.is-active {
+      opacity: 1;
+    }
+
+    .menu-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 16px;
+
+      font-size: 0.85rem;
+    }
+
+    .menu-bottom .copy {
+      opacity: 0.6;
+    }
+
+    .socials {
+      display: flex;
+      gap: 20px;
+    }
+
+    .socials a {
+      text-decoration: none;
+      opacity: 0.75;
+    }
+
+    .socials a:hover,
+    .socials a:focus-visible {
+      opacity: 1;
+    }
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .page {
+      margin-left: var(--sidebar-w);
+    }
+
+    .page-head {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-w);
+      right: 0;
+      z-index: 40;
+      background: var(--bg);
+      overflow: hidden;
+      isolation: isolate;
+      padding:
+        var(--page-top)
+        var(--gap)
+        clamp(28px, 4vw, 48px);
+    }
+
+    /* Le header fixe est opaque (pour masquer le contenu qui défile dessous),
+       il cache donc le grain global : on lui en donne une copie alignée. */
+    .page-head::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      top: -500px;
+      left: calc(-500px - var(--sidebar-w));
+      width: calc(100vw + 1000px);
+      height: calc(100vh + 1000px);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2' intercept='-.5'/%3E%3CfeFuncG type='linear' slope='2' intercept='-.5'/%3E%3CfeFuncB type='linear' slope='2' intercept='-.5'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 320px 320px;
+      opacity: 0;
+      animation: tv-noise 3s steps(8, end) infinite both;
+      transition: opacity .6s ease;
+      pointer-events: none;
+    }
+
+    .tv-noise-wrapper.is-visible ~ .page .page-head::before {
+      opacity: 0.5;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .page-head::before { animation: none; }
+    }
+
+    .page-head h1 {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .page-head p {
+      margin: 14px 0 0;
+      max-width: 46ch;
+
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    /* =========================================================
+       MAIN LAYOUT
+       ========================================================= */
+
+    .work {
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) 1.7fr;
+      gap: var(--gap);
+
+      padding: var(--page-head-h) var(--gap) 120px;
+      align-items: start;
+    }
+
+    /*
+      IMPORTANT:
+      The left column is the sticky part.
+      The right column remains in NORMAL document flow.
+      This gives the browser a real page to scroll.
+    */
+
+    .index {
+      position: sticky;
+      top: var(--sticky-top);
+
+      align-self: start;
+
+      display: flex;
+      flex-direction: column;
+
+      /*
+        No overflow-y here.
+        The page itself owns the scroll.
+      */
+      overflow: visible;
+    }
+
+    .index-row {
+      position: relative;
+
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: baseline;
+      gap: 16px;
+
+      padding: 14px 0;
+
+      border-top: 1px solid var(--line);
+
+      cursor: pointer;
+    }
+
+    .index-row:last-child {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .index-title {
+      min-width: 0;
+
+      font-family: var(--font-display);
+      font-size: clamp(18px, 2vw, 24px);
+      font-weight: 600;
+      line-height: 1.15;
+
+      color: var(--ink-soft);
+      letter-spacing: -0.01em;
+
+      transition:
+        color 0.35s ease,
+        font-weight 0.35s ease;
+    }
+
+    .index-year {
+      font-size: 14px;
+      color: var(--ink-soft);
+      transition: color 0.35s ease;
+    }
+
+    .index-row.is-active .index-title,
+    .index-row.is-active .index-year {
+      color: var(--ink);
+    }
+
+    .index-row.is-active .index-title {
+      font-weight: 700;
+    }
+
+    .index-desc {
+      grid-column: 1 / -1;
+
+      max-height: 0;
+      overflow: hidden;
+
+      margin-top: 0;
+
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+
+      transition:
+        max-height 0.4s ease,
+        margin-top 0.4s ease;
+    }
+
+    .index-row.is-active .index-desc {
+      max-height: 480px;
+      margin-top: 8px;
+    }
+
+    .index-desc p {
+      margin: 0 0 10px;
+    }
+
+    .index-desc p:last-child {
+      margin-bottom: 0;
+    }
+
+    .index-link {
+      grid-column: 1 / -1;
+
+      display: none;
+
+      width: fit-content;
+
+      margin-top: 10px;
+
+      font-size: 13px;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .index-row.is-active .index-link {
+      display: inline-block;
+    }
+
+    /* =========================================================
+       RIGHT: NORMAL FLOW CASE STUDIES
+       ========================================================= */
+
+    .stage {
+      position: relative;
+      width: 100%;
+      height: auto;
+    }
+
+    /*
+      Every project is in normal document flow.
+      Nothing is position:absolute here.
+    */
+
+    .stage-slide {
+      position: relative;
+
+      width: 100%;
+
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      margin: 0 0 clamp(100px, 16vh, 180px);
+      padding: 0;
+
+      opacity: 1;
+      transform: none;
+
+      scroll-margin-top: var(--sticky-top);
+    }
+
+    .stage-slide:last-child {
+      margin-bottom: 0;
+    }
+
+    .stage-slide--composition > img {
+      display: block;
+
+      position: static;
+      inset: auto;
+
+      width: 100%;
+      height: auto;
+
+      object-fit: cover;
+    }
+
+    .case-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .case-row--3 {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .case-row--fit {
+      display: flex;
+    }
+
+    .case-row--fit img {
+      min-width: 0;
+    }
+
+    .case-row img {
+      display: block;
+
+      width: 100%;
+      height: auto;
+
+      object-fit: cover;
+    }
+
+    .stage-caption {
+      padding: 14px 0 0;
+
+      font-family: var(--font-display);
+      font-size: 14px;
+      color: var(--ink-soft);
+    }
+
+    /*
+      The project currently near the center of the viewport
+      gets a small visual marker on the right.
+    */
+    .stage-slide.is-visible {
+      /* Intentionally subtle: the slide stays in normal flow. */
+    }
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    .mobile-image {
+      display: none;
+    }
+
+    @media (max-width: 860px) {
+      :root {
+        --sidebar-w: 0px;
+        --sticky-top: 0px;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .menu-overlay {
+        left: 0;
+      }
+
+      .page {
+        margin-left: 0;
+      }
+
+      .page-head {
+        padding:
+          40px
+          clamp(24px, 6vw, 40px)
+          32px;
+      }
+
+      .work {
+        grid-template-columns: 1fr;
+        padding:
+          0
+          clamp(24px, 6vw, 40px)
+          80px;
+      }
+
+      .index {
+        position: static;
+      }
+
+      .stage {
+        display: none;
+      }
+
+      .index-row {
+        cursor: default;
+      }
+
+      .index-desc {
+        display: none;
+        max-height: none;
+        overflow: visible;
+        margin-top: 8px;
+      }
+
+      .index-row.is-active .index-desc {
+        display: block;
+      }
+
+      .mobile-image {
+        grid-column: 1 / -1;
+
+        display: none;
+
+        width: 100%;
+        height: auto;
+        max-height: 70vh;
+
+        object-fit: contain;
+
+        margin-top: 14px;
+
+        border-radius: 4px;
+        background: var(--bg-raised);
+      }
+
+      .index-row.is-active .mobile-image {
+        display: block;
+      }
+
+      .index-link {
+        display: none;
+      }
+
+      .index-row.is-active .index-link {
+        display: inline-block;
+      }
+    }
+  </style>
+<link rel="stylesheet" href="tv-noise.css">
+</head>
+
+<body>
+
+  <a class="skip-link" href="#main">Aller au contenu</a>
+
+  <!-- =======================================================
+       SIDEBAR
+       ======================================================= -->
+
+  <aside class="sidebar">
+
+    <button
+      class="hamburger"
+      id="menuToggle"
+      type="button"
+      aria-label="Ouvrir le menu"
+      aria-expanded="false"
+      aria-controls="menuOverlay"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <a
+      class="mid-stack"
+      href="index.html"
+      aria-label="Retour à l'accueil"
+    >
+      <span class="vlabel">PORTFOLIO</span>
+      <span class="vname">MANEL BEN HALIMA</span>
+    </a>
+
+    <span class="year">© 2026</span>
+
+  </aside>
+
+  <!-- =======================================================
+       MENU
+       ======================================================= -->
+
+  <nav
+    class="menu-overlay"
+    id="menuOverlay"
+    aria-hidden="true"
+  >
+
+    <div class="menu-top">
+      <span class="brand">Manel Ben Halima</span>
+
+      <button
+        class="menu-close"
+        id="menuClose"
+        type="button"
+      >
+        FERMER
+      </button>
+    </div>
+
+    <div class="menu-nav">
+
+      <a
+        href="index.html#accueil"
+        class="menu-link"
+      >
+        <span class="idx">01</span>
+        Accueil
+      </a>
+
+      <a
+        href="apropos.html"
+        class="menu-link"
+      >
+        <span class="idx">02</span>
+        À propos
+      </a>
+
+      <a
+        href="index.html#travaux"
+        class="menu-link"
+      >
+        <span class="idx">03</span>
+        Travaux
+      </a>
+
+      <a
+        href="index.html#contact"
+        class="menu-link"
+      >
+        <span class="idx">04</span>
+        Contact
+      </a>
+
+    </div>
+
+    <div class="menu-bottom">
+
+      <span class="copy">Basée à Montréal</span>
+
+      <div class="socials">
+
+        <a
+          href="https://www.linkedin.com/in/manel-ben-halima"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          LinkedIn
+        </a>
+
+        <a
+          href="https://www.behance.net/mmanelben"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Behance
+        </a>
+
+      </div>
+
+    </div>
+
+  </nav>
+
+  <!-- =======================================================
+       MAIN
+       ======================================================= -->
+
+  <main class="page" id="main">
+
+    <header class="page-head">
+
+      <h1>Graphique</h1>
+
+      <p>
+        Identités visuelles, chartes graphiques et campagnes print —
+        neuf projets, du concept à la livraison.
+      </p>
+
+    </header>
+
+
+    <div class="work" id="work">
+
+      <!-- ===================================================
+           LEFT: STICKY INDEX
+           =================================================== -->
+
+      <div class="index" id="index">
+
+        <div class="index-row" data-index="0">
+
+          <div class="index-title">
+            Pure Wine Carthage
+          </div>
+
+          <div class="index-year">
+            2026
+          </div>
+
+          <div class="index-desc">
+            <p>
+              L'objectif principal de ce projet était la création
+              d'une identité visuelle forte et mémorable, capable
+              de refléter les valeurs de la marque Pure Wine Carthage.
+              Cela inclut la création d'une étiquette de vin élégante
+              et contemporaine, ainsi que la création d'un univers
+              graphique cohérent, décliné sur différents supports
+              comme la bouteille, le packaging et la signalétique.
+            </p>
+          </div>
+
+          <img
+            class="mobile-image"
+            src="images/PureWine-Photo1.webp"
+            alt="Pure Wine Carthage"
+            loading="lazy"
+          >
+
+        </div>
+
+
+        <div class="index-row" data-index="1">
+
+          <div class="index-title">
+            Pavillon Lounge
+          </div>
+
+          <div class="index-year">
+            2026
+          </div>
+
+          <div class="index-desc">
+            <p>
+              Création d'une identité visuelle pour « Pavillon Lounge »
+              (logo, publications pour les réseaux sociaux…).
+            </p>
+          </div>
+
+          <a class="index-link" href="#" target="_blank" rel="noopener">
+            Voir le projet →
+          </a>
+
+          <img
+            class="mobile-image"
+            src="images/Pavillon-Photo1.webp"
+            alt="Pavillon Lounge"
+            loading="lazy"
+          >
+
+        </div>
+
+
+        <div class="index-row" data-index="2">
+
+          <div class="index-title">
+            Jardins intérieurs
+          </div>
+
+          <div class="index-year">
+            2026
+          </div>
+
+          <div class="index-desc">
+            <p>
+              Élaboration de l'identité graphique et de la mise en page,
+              ainsi que des illustrations et de la couverture.
+            </p>
+            <p>
+              Création d'une campagne d'affichage, d'invitations,
+              d'un catalogue et de panneaux d'exposition.
+            </p>
+          </div>
+
+          <a class="index-link" href="#" target="_blank" rel="noopener">
+            Voir le projet →
+          </a>
+
+          <img
+            class="mobile-image"
+            src="images/jardin-interieur-photo1.webp"
+            alt="Jardins intérieurs"
+            loading="lazy"
+          >
+
+        </div>
+
+
+        <div class="index-row" data-index="3">
+
+          <div class="index-title">
+            XVIII Sommet de la Francophonie
+          </div>
+
+          <div class="index-year">
+            2022
+          </div>
+
+          <div class="index-desc">
+            <p>
+              Création de l'identité visuelle du XVIII Sommet de la
+              Francophonie, organisé à Djerba en novembre 2022, et
+              déclinaison sur différents supports de communication :
+              affiches, brochures, documents institutionnels,
+              signalétique, etc.
+            </p>
+            <p>
+              L'objectif était de transmettre l'esprit du sommet à travers
+              une charte graphique moderne, fédératrice et accessible,
+              mettant en valeur la connectivité dans la diversité.
+            </p>
+            <p>
+              Chaque support a été décliné dans le respect des valeurs de
+              la Francophonie, tout en s'adaptant aux thématiques
+              principales du sommet : politique, économie, culture et
+              numérique.
+            </p>
+          </div>
+
+          <a class="index-link" href="#" target="_blank" rel="noopener">
+            Voir le projet →
+          </a>
+
+          <img
+            class="mobile-image"
+            src="images/djerba-Photo1.webp"
+            alt="XVIII Sommet de la Francophonie"
+            loading="lazy"
+          >
+
+        </div>
+
+
+        <div class="index-row" data-index="4">
+
+          <div class="index-title">
+            La semaine de la cuisine italienne
+          </div>
+
+          <div class="index-year">
+            2025
+          </div>
+
+          <div class="index-desc">
+            <p>
+              Une tournée de dégustation de spécialités italiennes
+              organisée par l'ambassade d'Italie à Tunis, en partenariat
+              avec la municipalité de Tunis et le traiteur Rosmarino.
+            </p>
+            <p>
+              Création d'une charte graphique modulable sur différents
+              supports et illustration d'un large spectre de sujets,
+              tout en leur définissant à chacun une identité propre.
+            </p>
+          </div>
+
+          <a class="index-link" href="#" target="_blank" rel="noopener">
+            Voir le projet →
+          </a>
+
+          <img
+            class="mobile-image"
+            src="images/cuisine-Photo1.webp"
+            alt="La semaine de la cuisine italienne"
+            loading="lazy"
+          >
+
+        </div>
+
+
+        <div class="index-row" data-index="5">
+
+          <div class="index-title">
+            Rapport institutionnel
+          </div>
+
+          <div class="index-year">
+            2025
+          </div>
+
+          <div class="index-desc">
+            <p>
+              À travers le Centre Socrate pour l'étude de la justice,
+              l'association Maak a réalisé une étude portant sur la réalité
+              de ceux qui ont vécu une expérience pénitentiaire en Tunisie,
+              et ce après leur libération. Cette étude a été appelée
+              « Punition sans fin ».
+            </p>
+            <p>
+              Réalisation de la mise en page ainsi que des illustrations
+              et de la couverture dans les 3 langues.
+            </p>
+          </div>
+
+          <a class="index-link" href="#" target="_blank" rel="noopener">
+            Voir le projet →
+          </a>
+
+          <img
+            class="mobile-image"
+            src="images/Maak-Photo1.webp"
+            alt="Rapport institutionnel — Punition sans fin"
+            loading="lazy"
+          >
+
+        </div>
+
+
+        <div class="index-row" data-index="6">
+
+          <div class="index-title">
+            Création de supports print
+          </div>
+
+          <div class="index-year">
+            2025
+          </div>
+
+          <div class="index-desc">
+            <p>
+              Création de plusieurs supports de communication pour le
+              Programme MED MSMEs, incluant brochures, dépliants, rapports,
+              tote bags et affiches.
+            </p>
+            <p>
+              L'objectif était de décliner une charte graphique claire et
+              cohérente tout en conservant l'identité visuelle du programme.
+            </p>
+          </div>
+
+          <a class="index-link" href="#" target="_blank" rel="noopener">
+            Voir le projet →
+          </a>
+
+          <img
+            class="mobile-image"
+            src="images/med-Photo1.webp"
+            alt="Création de supports print — Programme MED MSMEs"
+            loading="lazy"
+          >
+
+        </div>
+
+
+        <div class="index-row" data-index="7">
+
+          <div class="index-title">
+            Dossier de sponsoring
+          </div>
+
+          <div class="index-year">
+            2025
+          </div>
+
+          <div class="index-desc">
+            <p>
+              Élaboration de l'identité graphique et de la mise en page,
+              ainsi que des illustrations et de la couverture.
+            </p>
+          </div>
+
+          <a class="index-link" href="#" target="_blank" rel="noopener">
+            Voir le projet →
+          </a>
+
+          <img
+            class="mobile-image"
+            src="images/dossier-de-spon-Photo1.webp"
+            alt="Dossier de sponsoring"
+            loading="lazy"
+          >
+
+        </div>
+
+
+        <div class="index-row" data-index="8">
+
+          <div class="index-title">
+            Catalogue
+          </div>
+
+          <div class="index-year">
+            2025
+          </div>
+
+          <div class="index-desc">
+            <p>
+              Texte à venir.
+            </p>
+          </div>
+
+          <img
+            class="mobile-image"
+            src="images/mari-Photo2.webp"
+            alt="Catalogue"
+            loading="lazy"
+          >
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           RIGHT: REAL DOCUMENT SCROLL
+           =================================================== -->
+
+      <div class="stage" id="stage">
+
+
+        <!-- ================= PROJECT 01 ================= -->
+
+        <article
+          class="stage-slide stage-slide--composition"
+          data-index="0"
+          id="project-0"
+        >
+
+          <img
+            src="images/PureWine-Photo1.webp"
+            alt="Pure Wine Carthage — bannière logo"
+            loading="eager"
+          >
+
+          <div class="case-row">
+
+            <img
+              src="images/PureWine-Photo2.webp"
+              alt="Pure Wine Carthage — bouteille"
+              loading="lazy"
+            >
+
+            <img
+              src="images/PureWine-Photo3.webp"
+              alt="Pure Wine Carthage — palette de couleurs"
+              loading="lazy"
+            >
+
+          </div>
+
+          <img
+            src="images/PureWine-Photo4.webp"
+            alt="Pure Wine Carthage — composition visuelle"
+            loading="lazy"
+          >
+
+          <div class="case-row">
+
+            <img
+              src="images/PureWine-Photo5.webp"
+              alt="Pure Wine Carthage — sac"
+              loading="lazy"
+            >
+
+            <img
+              src="images/PureWine-Photo6.webp"
+              alt="Pure Wine Carthage — signalétique"
+              loading="lazy"
+            >
+
+          </div>
+
+          <img
+            src="images/PureWine-Photo7.webp"
+            alt="Pure Wine Carthage — bannière finale"
+            loading="lazy"
+          >
+
+        </article>
+
+
+        <!-- ================= PROJECT 02 ================= -->
+
+        <article
+          class="stage-slide stage-slide--composition"
+          data-index="1"
+          id="project-1"
+        >
+
+          <img
+            src="images/Pavillon-Photo1.webp"
+            alt="Pavillon Lounge — visuel 1"
+            loading="lazy"
+          >
+
+          <div class="case-row">
+
+            <img
+              src="images/Pavillon-Photo2.webp"
+              alt="Pavillon Lounge — visuel 2"
+              loading="lazy"
+            >
+
+            <img
+              src="images/Pavillon-Photo3.webp"
+              alt="Pavillon Lounge — visuel 3"
+              loading="lazy"
+            >
+
+          </div>
+
+          <div class="case-row">
+
+            <img
+              src="images/Pavillon-Photo4.webp"
+              alt="Pavillon Lounge — visuel 4"
+              loading="lazy"
+            >
+
+            <img
+              src="images/Pavillon-Photo5.webp"
+              alt="Pavillon Lounge — visuel 5"
+              loading="lazy"
+            >
+
+          </div>
+
+          <img
+            src="images/Pavillon-Photo6.webp"
+            alt="Pavillon Lounge — visuel 6"
+            loading="lazy"
+          >
+
+        </article>
+
+
+        <!-- ================= PROJECT 03 ================= -->
+
+        <article
+          class="stage-slide stage-slide--composition"
+          data-index="2"
+          id="project-2"
+        >
+
+          <img
+            src="images/jardin-interieur-photo1.webp"
+            alt="Jardins intérieurs — visuel 1"
+            loading="lazy"
+          >
+
+          <img
+            src="images/jardin-interieur-photo2.webp"
+            alt="Jardins intérieurs — visuel 2"
+            loading="lazy"
+          >
+
+          <div class="case-row">
+
+            <img
+              src="images/jardin-interieur-photo3.webp"
+              alt="Jardins intérieurs — visuel 3"
+              loading="lazy"
+            >
+
+            <img
+              src="images/jardin-interieur-photo4.webp"
+              alt="Jardins intérieurs — visuel 4"
+              loading="lazy"
+            >
+
+          </div>
+
+          <div class="case-row case-row--3">
+
+            <img
+              src="images/jardin-interieur-photo5.webp"
+              alt="Jardins intérieurs — visuel 5"
+              loading="lazy"
+            >
+
+            <img
+              src="images/jardin-interieur-photo6.webp"
+              alt="Jardins intérieurs — visuel 6"
+              loading="lazy"
+            >
+
+            <img
+              src="images/jardin-interieur-photo7.webp"
+              alt="Jardins intérieurs — visuel 7"
+              loading="lazy"
+            >
+
+          </div>
+
+          <img
+            src="images/jardin-interieur-photo8.webp"
+            alt="Jardins intérieurs — visuel 8"
+            loading="lazy"
+          >
+
+        </article>
+
+
+        <!-- ================= PROJECT 04 ================= -->
+
+        <article
+          class="stage-slide stage-slide--composition"
+          data-index="3"
+          id="project-3"
+        >
+
+          <img
+            src="images/djerba-Photo1.webp"
+            alt="Sommet de la Francophonie — visuel 1"
+            loading="lazy"
+          >
+
+          <!-- case-row--fit : même hauteur, chaque photo garde ses proportions
+               (flex = largeur d'origine de l'image) -->
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/djerba-Photo2.webp"
+              alt="Sommet de la Francophonie — visuel 2"
+              loading="lazy"
+              style="flex: 4398"
+            >
+
+            <img
+              src="images/djerba-Photo16.webp"
+              alt="Sommet de la Francophonie — visuel 16"
+              loading="lazy"
+              style="flex: 4398"
+            >
+
+            <img
+              src="images/djerba-Photo14.webp"
+              alt="Sommet de la Francophonie — visuel 14"
+              loading="lazy"
+              style="flex: 2941"
+            >
+
+            <img
+              src="images/djerba-Photo15.webp"
+              alt="Sommet de la Francophonie — visuel 15"
+              loading="lazy"
+              style="flex: 1551"
+            >
+
+          </div>
+
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/djerba-Photo3.webp"
+              alt="Sommet de la Francophonie — visuel 3"
+              loading="lazy"
+              style="flex: 4398"
+            >
+
+            <img
+              src="images/djerba-Photo4.webp"
+              alt="Sommet de la Francophonie — visuel 4"
+              loading="lazy"
+              style="flex: 4398"
+            >
+
+            <img
+              src="images/djerba-Photo5.webp"
+              alt="Sommet de la Francophonie — visuel 5"
+              loading="lazy"
+              style="flex: 4398"
+            >
+
+          </div>
+
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/djerba-Photo6.webp"
+              alt="Sommet de la Francophonie — visuel 6"
+              loading="lazy"
+              style="flex: 4398"
+            >
+
+            <img
+              src="images/djerba-Photo12.webp"
+              alt="Sommet de la Francophonie — visuel 12"
+              loading="lazy"
+              style="flex: 2941"
+            >
+
+          </div>
+
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/djerba-Photo7.webp"
+              alt="Sommet de la Francophonie — visuel 7"
+              loading="lazy"
+              style="flex: 3881"
+            >
+
+            <img
+              src="images/djerba-Photo10.webp"
+              alt="Sommet de la Francophonie — visuel 10"
+              loading="lazy"
+              style="flex: 5929"
+            >
+
+          </div>
+
+          <img
+            src="images/djerba-Photo17.webp"
+            alt="Sommet de la Francophonie — visuel 17"
+            loading="lazy"
+          >
+
+          <img
+            src="images/djerba-Photo18.webp"
+            alt="Sommet de la Francophonie — visuel 18"
+            loading="lazy"
+          >
+
+        </article>
+
+
+        <!-- ================= PROJECT 05 ================= -->
+
+        <article
+          class="stage-slide stage-slide--composition"
+          data-index="4"
+          id="project-4"
+        >
+
+          <img
+            src="images/cuisine-Photo1.webp"
+            alt="Cuisine italienne — visuel 1"
+            loading="lazy"
+          >
+
+          <div class="case-row">
+
+            <img
+              src="images/cuisine-Photo4.gif"
+              alt="Cuisine italienne — visuel 4"
+              loading="lazy"
+            >
+
+            <img
+              src="images/cuisine-Photo5.webp"
+              alt="Cuisine italienne — visuel 5"
+              loading="lazy"
+            >
+
+          </div>
+
+          <img
+            src="images/cuisine-Photo3.webp"
+            alt="Cuisine italienne — visuel 3"
+            loading="lazy"
+          >
+
+          <img
+            src="images/cuisine-Photo2.webp"
+            alt="Cuisine italienne — visuel 2"
+            loading="lazy"
+          >
+
+        </article>
+
+
+        <!-- ================= PROJECT 06 ================= -->
+
+        <article
+          class="stage-slide stage-slide--composition"
+          data-index="5"
+          id="project-5"
+        >
+
+          <img
+            src="images/Maak-Photo1.webp"
+            alt="Punition sans fin — visuel 1"
+            loading="lazy"
+          >
+
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/Maak-Photo2.webp"
+              alt="Punition sans fin — visuel 2"
+              loading="lazy"
+              style="flex: 3511"
+            >
+
+            <img
+              src="images/Maak-Photo3.webp"
+              alt="Punition sans fin — visuel 3"
+              loading="lazy"
+              style="flex: 3063"
+            >
+
+          </div>
+
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/Maak-Photo4.webp"
+              alt="Punition sans fin — visuel 4"
+              loading="lazy"
+              style="flex: 3511"
+            >
+
+            <img
+              src="images/Maak-Photo5.webp"
+              alt="Punition sans fin — visuel 5"
+              loading="lazy"
+              style="flex: 3063"
+            >
+
+          </div>
+
+        </article>
+
+
+        <!-- ================= PROJECT 07 ================= -->
+
+        <article
+          class="stage-slide stage-slide--composition"
+          data-index="6"
+          id="project-6"
+        >
+
+          <img
+            src="images/med-Photo1.webp"
+            alt="MED MSMEs — visuel 1"
+            loading="lazy"
+          >
+
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/med-Photo2.webp"
+              alt="MED MSMEs — visuel 2"
+              loading="lazy"
+              style="flex: 1734"
+            >
+
+            <img
+              src="images/med-Photo3.webp"
+              alt="MED MSMEs — visuel 3"
+              loading="lazy"
+              style="flex: 1442"
+            >
+
+          </div>
+
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/med-Photo4.webp"
+              alt="MED MSMEs — visuel 4"
+              loading="lazy"
+              style="flex: 1538"
+            >
+
+            <img
+              src="images/med-Photo5.webp"
+              alt="MED MSMEs — visuel 5"
+              loading="lazy"
+              style="flex: 1538"
+            >
+
+          </div>
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/med-Photo7.webp"
+              alt="MED MSMEs — visuel 7"
+              loading="lazy"
+              style="flex: 1535"
+            >
+
+            <img
+              src="images/med-Photo8.webp"
+              alt="MED MSMEs — visuel 8"
+              loading="lazy"
+              style="flex: 1535"
+            >
+
+            <img
+              src="images/med-Photo9.webp"
+              alt="MED MSMEs — visuel 9"
+              loading="lazy"
+              style="flex: 1535"
+            >
+
+          </div>
+
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/med-Photo12.webp"
+              alt="MED MSMEs — visuel 12"
+              loading="lazy"
+              style="flex: 864"
+            >
+
+            <img
+              src="images/med-Photo13.webp"
+              alt="MED MSMEs — visuel 13"
+              loading="lazy"
+              style="flex: 864"
+            >
+
+            <img
+              src="images/med-Photo6.webp"
+              alt="MED MSMEs — visuel 6"
+              loading="lazy"
+              style="flex: 770"
+            >
+
+            <img
+              src="images/med-Photo10.webp"
+              alt="MED MSMEs — visuel 10"
+              loading="lazy"
+              style="flex: 988"
+            >
+
+            <img
+              src="images/med-Photo11.webp"
+              alt="MED MSMEs — visuel 11"
+              loading="lazy"
+              style="flex: 864"
+            >
+
+          </div>
+
+        </article>
+
+
+        <!-- ================= PROJECT 08 ================= -->
+
+        <article
+          class="stage-slide stage-slide--composition"
+          data-index="7"
+          id="project-7"
+        >
+
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/dossier-de-spon-Photo1.webp"
+              alt="Dossier de sponsoring — visuel 1"
+              loading="lazy"
+              style="flex: 1774"
+            >
+
+            <img
+              src="images/dossier-de-spon-Photo2.webp"
+              alt="Dossier de sponsoring — visuel 2"
+              loading="lazy"
+              style="flex: 662"
+            >
+
+          </div>
+
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/dossier-de-spon-Photo4.webp"
+              alt="Dossier de sponsoring — visuel 4"
+              loading="lazy"
+              style="flex: 828"
+            >
+
+            <img
+              src="images/dossier-de-spon-Photo3.webp"
+              alt="Dossier de sponsoring — visuel 3"
+              loading="lazy"
+              style="flex: 1774"
+            >
+
+          </div>
+
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/dossier-de-spon-Photo5.webp"
+              alt="Dossier de sponsoring — visuel 5"
+              loading="lazy"
+              style="flex: 1774"
+            >
+
+            <img
+              src="images/dossier-de-spon-Photo6.webp"
+              alt="Dossier de sponsoring — visuel 6"
+              loading="lazy"
+              style="flex: 662"
+            >
+
+          </div>
+
+        </article>
+
+
+        <!-- ================= PROJECT 09 ================= -->
+
+        <article
+          class="stage-slide stage-slide--composition"
+          data-index="8"
+          id="project-8"
+        >
+
+          <img
+            src="images/mari-Photo2.webp"
+            alt="Catalogue — visuel 2"
+            loading="lazy"
+          >
+
+          <div class="case-row case-row--fit">
+
+            <img
+              src="images/mari-Photo1.webp"
+              alt="Catalogue — visuel 1"
+              loading="lazy"
+              style="flex: 1108"
+            >
+
+            <img
+              src="images/mari-Photo3.webp"
+              alt="Catalogue — visuel 3"
+              loading="lazy"
+              style="flex: 1774"
+            >
+
+          </div>
+
+        </article>
+
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- =======================================================
+       JAVASCRIPT
+       ======================================================= -->
+
+  <script>
+    (() => {
+      const rows = Array.from(document.querySelectorAll(".index-row"));
+      const slides = Array.from(document.querySelectorAll(".stage-slide"));
+      const mobileQuery = window.matchMedia("(max-width: 860px)");
+
+      let activeIndex = -1;
+      let ticking = false;
+
+      function setActive(index) {
+        const value = String(index);
+        const numeric = Number(index);
+
+        if (activeIndex === numeric) return;
+        activeIndex = numeric;
+
+        rows.forEach((row) => {
+          row.classList.toggle("is-active", row.dataset.index === value);
+        });
+      }
+
+      /*
+       * DESKTOP
+       *
+       * The projects on the right stay in normal document flow.
+       * We choose the project whose TOP has most recently crossed
+       * an activation line located at 35% of the viewport.
+       *
+       * This is more reliable than observing a very small 10% band:
+       * - project 01 cannot be skipped on page load
+       * - project 07 and 08 can become active near the bottom
+       * - every project gets a deterministic activation point
+       */
+      function updateDesktopActive() {
+        if (mobileQuery.matches || !slides.length) return;
+
+        const activationY = window.innerHeight * 0.35;
+        let current = 0;
+
+        for (let i = 0; i < slides.length; i++) {
+          const rect = slides[i].getBoundingClientRect();
+
+          if (rect.top <= activationY) {
+            current = i;
+          } else {
+            break;
+          }
+        }
+
+        setActive(current);
+      }
+
+      function requestDesktopUpdate() {
+        if (ticking) return;
+
+        ticking = true;
+        window.requestAnimationFrame(() => {
+          ticking = false;
+          updateDesktopActive();
+        });
+      }
+
+      /*
+       * MOBILE
+       *
+       * On mobile the stage is hidden. The index rows themselves
+       * determine which project is active.
+       */
+      const rowObserver = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort(
+              (a, b) =>
+                Math.abs(a.boundingClientRect.top - window.innerHeight * 0.4) -
+                Math.abs(b.boundingClientRect.top - window.innerHeight * 0.4)
+            );
+
+          if (visible.length) {
+            setActive(visible[0].target.dataset.index);
+          }
+        },
+        {
+          root: null,
+          rootMargin: "-30% 0px -55% 0px",
+          threshold: 0
+        }
+      );
+
+      function updateObservers() {
+        rowObserver.disconnect();
+
+        if (mobileQuery.matches) {
+          window.removeEventListener("scroll", requestDesktopUpdate);
+          window.removeEventListener("resize", requestDesktopUpdate);
+
+          rows.forEach((row) => rowObserver.observe(row));
+
+          /* Make sure the first visible mobile project is selected. */
+          const firstVisible = rows.find((row) => {
+            const rect = row.getBoundingClientRect();
+            return rect.bottom > 0 && rect.top < window.innerHeight;
+          });
+
+          if (firstVisible) {
+            setActive(firstVisible.dataset.index);
+          }
+        } else {
+          window.addEventListener("scroll", requestDesktopUpdate, { passive: true });
+          window.addEventListener("resize", requestDesktopUpdate);
+
+          /* Always start at project 01, then calculate from the real scroll position. */
+          setActive(0);
+          updateDesktopActive();
+        }
+      }
+
+      /*
+       * Clicking an index row scrolls to its REAL project on the right.
+       * There is no artificial scroll track anymore.
+       */
+      rows.forEach((row) => {
+        row.addEventListener("click", () => {
+          const index = row.dataset.index;
+          const target = slides.find(
+            (slide) => slide.dataset.index === index
+          );
+
+          setActive(index);
+
+          if (mobileQuery.matches || !target) return;
+
+          const top =
+            window.scrollY + target.getBoundingClientRect().top -
+            24;
+
+          window.scrollTo({
+            top: Math.max(0, top),
+            behavior: "smooth"
+          });
+        });
+      });
+
+      if (mobileQuery.addEventListener) {
+        mobileQuery.addEventListener("change", updateObservers);
+      }
+
+      /* Initial state: project 01 is ALWAYS active. */
+      setActive(0);
+      updateObservers();
+    })();
+
+    /* =======================================================
+       MENU
+       ======================================================= */
+
+    (() => {
+      const toggle =
+        document.getElementById("menuToggle");
+
+      const closeBtn =
+        document.getElementById("menuClose");
+
+      const overlay =
+        document.getElementById("menuOverlay");
+
+      const links =
+        overlay.querySelectorAll(".menu-link");
+
+
+      function openMenu() {
+        overlay.classList.add("is-open");
+
+        toggle.classList.add("is-open");
+
+        toggle.setAttribute(
+          "aria-expanded",
+          "true"
+        );
+
+        toggle.setAttribute(
+          "aria-label",
+          "Fermer le menu"
+        );
+
+        overlay.setAttribute(
+          "aria-hidden",
+          "false"
+        );
+      }
+
+
+      function closeMenu() {
+        overlay.classList.remove("is-open");
+
+        toggle.classList.remove("is-open");
+
+        toggle.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+
+        toggle.setAttribute(
+          "aria-label",
+          "Ouvrir le menu"
+        );
+
+        overlay.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+      }
+
+
+      toggle.addEventListener(
+        "click",
+        () => {
+          overlay.classList.contains("is-open")
+            ? closeMenu()
+            : openMenu();
+        }
+      );
+
+
+      closeBtn.addEventListener(
+        "click",
+        closeMenu
+      );
+
+
+      links.forEach((link) => {
+        link.addEventListener(
+          "click",
+          closeMenu
+        );
+      });
+
+
+      document.addEventListener(
+        "keydown",
+        (event) => {
+          if (event.key === "Escape") {
+            closeMenu();
+          }
+        }
+      );
+
+    })();
+
+
+    /* =======================================================
+       FIXED PAGE HEADER
+       ======================================================= */
+
+    (() => {
+      const header = document.querySelector(".page-head");
+
+      function setHeaderHeight() {
+        const h = header.offsetHeight;
+        document.documentElement.style.setProperty("--page-head-h", h + "px");
+        document.documentElement.style.setProperty("--sticky-top", (h + 24) + "px");
+      }
+
+      setHeaderHeight();
+      window.addEventListener("resize", setHeaderHeight);
+    })();
+  </script>
+
+<script src="tv-noise.js"></script>
+</body>
+</html>

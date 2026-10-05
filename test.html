@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polar Line — Expéditions</title>
+<style>
+  :root{
+    --ink:#0a0f14;
+    --ink-2:#0f161d;
+    --frost:#eef4f7;
+    --frost-dim:rgba(238,244,247,0.72);
+    --cyan:#7fd7e8;
+    --amber:#e8b26a;
+    --line:rgba(238,244,247,0.18);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+
+  body{
+    background:var(--ink);
+    color:var(--frost);
+    font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:22px 16px 14px;
+    letter-spacing:0.32em;
+    font-size:12px;
+    font-family:Helvetica,Arial,sans-serif;
+    color:var(--frost-dim);
+  }
+  .topbar b{ color:var(--frost); font-weight:600; }
+
+  .stage{
+    max-width:1400px;
+    margin:0 auto;
+    padding:0 16px 40px;
+  }
+
+  .accordion{
+    display:flex;
+    height:min(72vh, 640px);
+    min-height:420px;
+    width:100%;
+    gap:4px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding:4px 0;
+  }
+
+  .panel{
+    position:relative;
+    flex:1;
+    min-width:60px;
+    border-radius:2px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:flex 620ms cubic-bezier(.22,.61,.36,1);
+    background:linear-gradient(180deg, var(--ink-2), var(--ink));
+  }
+
+  .accordion:hover .panel{ flex:1; }
+  .accordion .panel:hover{ flex:6; }
+
+  .panel-art{
+    position:absolute;
+    inset:0;
+    background-size:cover;
+    background-position:center;
+    filter:saturate(0.9) brightness(0.92);
+    transform:scale(1.06);
+    transition:filter 620ms ease, transform 620ms ease;
+  }
+  .panel:hover .panel-art{ filter:saturate(1.05) brightness(1.02); transform:scale(1); }
+
+  .panel-shade{
+    position:absolute; inset:0;
+    background:
+      linear-gradient(180deg, rgba(4,8,11,0.55) 0%, rgba(4,8,11,0.05) 30%, rgba(4,8,11,0.05) 55%, rgba(4,8,11,0.75) 100%);
+  }
+
+  .panel-label{
+    position:absolute;
+    left:20px; right:20px; bottom:18px;
+    white-space:nowrap;
+  }
+
+  .panel-label .eyebrow{
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:11px;
+    letter-spacing:0.14em;
+    color:var(--cyan);
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity 380ms ease 120ms, transform 380ms ease 120ms;
+    margin-bottom:6px;
+  }
+  .panel:hover .eyebrow{ opacity:1; transform:translateY(0); }
+
+  .panel-label h2{
+    font-size:clamp(20px,2.4vw,30px);
+    font-weight:400;
+    font-style:italic;
+    margin:0 0 10px;
+    line-height:1.15;
+    opacity:0;
+    transform:translateY(8px);
+    transition:opacity 420ms ease 60ms, transform 420ms ease 60ms;
+  }
+  .panel:hover .panel-label h2{ opacity:1; transform:translateY(0); }
+
+  .panel-meta{
+    display:flex; align-items:center; gap:10px;
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:12.5px;
+    color:var(--frost-dim);
+    opacity:0;
+    transition:opacity 420ms ease 160ms;
+    white-space:normal;
+  }
+  .panel:hover .panel-meta{ opacity:1; }
+  .panel-meta .dot{ width:3px;height:3px;border-radius:50%;background:var(--frost-dim); }
+
+  .panel-desc{
+    max-width:340px;
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--frost-dim);
+    margin-top:10px;
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity 420ms ease 200ms, transform 420ms ease 200ms;
+  }
+  .panel:hover .panel-desc{ opacity:1; transform:translateY(0); }
+
+  .panel-more{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-top:16px;
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:12px;
+    letter-spacing:0.04em;
+    color:var(--frost);
+    opacity:0;
+    transition:opacity 420ms ease 260ms;
+  }
+  .panel:hover .panel-more{ opacity:1; }
+  .panel-more::after{
+    content:"";
+    width:6px; height:6px; border-radius:50%;
+    background:var(--amber);
+    box-shadow:0 0 0 0 rgba(232,178,106,0.5);
+    animation:pulse 2.2s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(232,178,106,0.45); }
+    70%{ box-shadow:0 0 0 8px rgba(232,178,106,0); }
+    100%{ box-shadow:0 0 0 0 rgba(232,178,106,0); }
+  }
+
+  .panel-index{
+    position:absolute;
+    top:18px; left:20px;
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:11px;
+    color:var(--frost-dim);
+    letter-spacing:0.08em;
+  }
+
+  .foot{
+    text-align:center;
+    font-family:Helvetica,Arial,sans-serif;
+    font-size:11.5px;
+    color:var(--frost-dim);
+    letter-spacing:0.03em;
+    padding-top:18px;
+  }
+
+  @media (max-width: 720px){
+    .accordion{ flex-direction:column; height:auto; }
+    .panel{ flex:none !important; height:64px; transition:height 520ms ease; }
+    .accordion .panel{ height:64px; }
+    .panel.is-open{ height:300px; }
+    .panel-label{ white-space:normal; }
+    .panel-desc{ max-width:100%; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar"><b>POLAR LINE</b>&nbsp;&nbsp;— expéditions polaires sur mesure</div>
+
+  <div class="stage">
+    <div class="accordion" id="accordion">
+
+      <div class="panel" data-art="1">
+        <div class="panel-art" style="background:
+          radial-gradient(120% 90% at 20% 10%, #cfe9f2 0%, #9fc9dc 30%, #486a82 62%, #1c2b38 100%)"></div>
+        <div class="panel-shade"></div>
+        <div class="panel-index">01</div>
+        <div class="panel-label">
+          <div class="eyebrow">SVALBARD · SAISON PRÉCOCE</div>
+          <h2>Aurores &amp; Fjords de Glace</h2>
+          <div class="panel-meta">18 400 €<span class="dot"></span>7 jours</div>
+          <div class="panel-desc">Une traversée en motoneige entre falaises de glace et fjords gelés, avec bivouac sous les aurores boréales.</div>
+          <div class="panel-more">En savoir plus</div>
+        </div>
+      </div>
+
+      <div class="panel" data-art="2">
+        <div class="panel-art" style="background:
+          radial-gradient(120% 90% at 70% 15%, #e7f3ee 0%, #b7d9cf 28%, #5c8f8a 58%, #223a3d 100%)"></div>
+        <div class="panel-shade"></div>
+        <div class="panel-index">02</div>
+        <div class="panel-label">
+          <div class="eyebrow">GROENLAND · ÉTÉ</div>
+          <h2>Soleil de Minuit</h2>
+          <div class="panel-meta">22 900 €<span class="dot"></span>9 jours</div>
+          <div class="panel-desc">Kayak entre les icebergs de la baie de Disko, sous un jour qui ne se couche jamais.</div>
+          <div class="panel-more">En savoir plus</div>
+        </div>
+      </div>
+
+      <div class="panel" data-art="3">
+        <div class="panel-art" style="background:
+          radial-gradient(120% 90% at 40% 20%, #f4f7f5 0%, #d8e2df 24%, #8b9c9a 55%, #333f40 100%)"></div>
+        <div class="panel-shade"></div>
+        <div class="panel-index">03</div>
+        <div class="panel-label">
+          <div class="eyebrow">ANTARCTIQUE · POLE SUD</div>
+          <h2>Le Silence Polaire</h2>
+          <div class="panel-meta">89 500 €<span class="dot"></span>12 jours</div>
+          <div class="panel-desc">Un vol jusqu'au Pôle Sud géographique, réservé à moins de 500 visiteurs par an.</div>
+          <div class="panel-more">En savoir plus</div>
+        </div>
+      </div>
+
+      <div class="panel" data-art="4">
+        <div class="panel-art" style="background:
+          radial-gradient(120% 90% at 60% 10%, #dff1fb 0%, #9fd6ef 26%, #2f88b0 55%, #113347 100%)"></div>
+        <div class="panel-shade"></div>
+        <div class="panel-index">04</div>
+        <div class="panel-label">
+          <div class="eyebrow">ANTARCTIQUE · GROTTES</div>
+          <h2>Grottes de Glace Bleue</h2>
+          <div class="panel-meta">31 200 €<span class="dot"></span>8 jours</div>
+          <div class="panel-desc">Exploration à pied de cavités glaciaires sculptées par des siècles de vent et de lumière.</div>
+          <div class="panel-more">En savoir plus</div>
+        </div>
+      </div>
+
+      <div class="panel" data-art="5">
+        <div class="panel-art" style="background:
+          radial-gradient(120% 90% at 25% 20%, #fbeee0 0%, #eec9a4 26%, #b97b4c 58%, #3a2416 100%)"></div>
+        <div class="panel-shade"></div>
+        <div class="panel-index">05</div>
+        <div class="panel-label">
+          <div class="eyebrow">ANTARCTIQUE · AUBE DE SAISON</div>
+          <h2>Premiers Feux du Camp</h2>
+          <div class="panel-meta">27 800 €<span class="dot"></span>6 jours</div>
+          <div class="panel-desc">L'ouverture de la saison, quand le camp renaît sous une lumière rasante et dorée.</div>
+          <div class="panel-more">En savoir plus</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="foot">Survolez un panneau pour l'ouvrir · Version tactile : touchez pour ouvrir</div>
+  </div>
+
+<script>
+  // Touch support: tap to expand on mobile, since hover doesn't exist there.
+  const panels = document.querySelectorAll('.panel');
+  const isTouch = window.matchMedia('(hover: none)').matches;
+
+  if (isTouch) {
+    panels.forEach(p => {
+      p.addEventListener('click', () => {
+        panels.forEach(other => { if (other !== p) other.classList.remove('is-open'); });
+        p.classList.toggle('is-open');
+      });
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graphique — Portfolio</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    /* ---------- Design tokens (site-wide, matches index.html / apropos.html) ---------- */
+    --sidebar-w: 64px;
+    --bg: #ffffff;
+    --bg-raised: #F5F5F1;
+    --ink: #1B1D1B;
+    --ink-soft: #55584f;
+    --line: rgba(27, 29, 27, 0.14);
+    --accent: #3B2FE0;
+    --font-display: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    --font-body: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+
+    --gap: clamp(24px, 5vw, 64px);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+  h1, h2, h3 { font-family: var(--font-display); margin: 0; letter-spacing: -0.01em; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .skip-link {
+    position: absolute;
+    left: -999px;
+    top: 0;
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 16px;
+    z-index: 300;
+  }
+  .skip-link:focus {
+    left: var(--sidebar-w);
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--sidebar-w);
+    border-right: 1px solid var(--line);
+    background: var(--bg);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+  }
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 22px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .hamburger span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: var(--ink);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .hamburger.is-open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .hamburger.is-open span:nth-child(2) { opacity: 0; }
+  .hamburger.is-open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  .vlabel, .vname, .year {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+  }
+  .vlabel { font-size: 0.7rem; letter-spacing: 0.08em; color: var(--ink-soft); }
+  .vname { font-family: var(--font-display); font-weight: 600; font-size: 0.85rem; color: var(--ink); }
+  .year { font-size: 0.68rem; color: var(--ink-soft); }
+  .mid-stack { display: flex; flex-direction: column; align-items: center; gap: 28px; text-decoration: none; }
+
+  /* ---------- Menu overlay ---------- */
+  .menu-overlay {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    left: var(--sidebar-w);
+    background: var(--ink);
+    color: var(--bg);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 28px 5vw;
+    transform: translateY(-100%);
+    transition: transform 0.45s cubic-bezier(.2,.7,.2,1);
+  }
+  .menu-overlay.is-open { transform: translateY(0); }
+
+  .menu-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .menu-top .brand { font-family: var(--font-display); font-size: 0.85rem; opacity: 0.7; }
+  .menu-close { background: none; border: none; color: inherit; font-size: 0.85rem; letter-spacing: 0.08em; cursor: pointer; }
+
+  .menu-nav { display: flex; flex-direction: column; gap: 6px; }
+  .menu-link {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    text-decoration: none;
+    opacity: 0.4;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2rem, 8vw, 4.4rem);
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+    transition: opacity 0.2s ease;
+  }
+  .menu-link .idx { font-size: clamp(0.85rem, 1.6vw, 1.1rem); font-weight: 500; opacity: 0.7; }
+  .menu-link:hover, .menu-link:focus-visible, .menu-link.is-active { opacity: 1; }
+
+  .menu-bottom { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; font-size: 0.85rem; }
+  .menu-bottom .copy { opacity: 0.6; }
+  .socials { display: flex; gap: 20px; }
+  .socials a { text-decoration: none; opacity: 0.75; }
+  .socials a:hover, .socials a:focus-visible { opacity: 1; }
+
+  .page { margin-left: var(--sidebar-w); }
+
+  .page-head {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--bg);
+    padding: clamp(40px, 8vw, 90px) var(--gap) clamp(20px, 4vw, 40px);
+  }
+
+  @media (max-width: 860px) {
+    .page-head {
+      position: static;
+    }
+  }
+
+  .page-head h1 {
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .page-head p {
+    margin: 14px 0 0;
+    max-width: 46ch;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- Layout ---------- */
+
+  .work {
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) 1.7fr;
+    gap: var(--gap);
+    padding: 0 var(--gap) 120px;
+    align-items: start;
+  }
+
+  /* Left: sticky index */
+
+  .index {
+    position: sticky;
+    top: var(--header-h, 0px);
+    height: calc(100dvh - var(--header-h, 0px));
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden; /* ne capture jamais le scroll local sur desktop normal */
+  }
+
+  @media (max-height: 640px) {
+    .index {
+      overflow-y: auto; /* vrai filet de sécurité, uniquement sur écrans très courts */
+    }
+  }
+
+  .index-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 16px;
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
+    cursor: pointer;
+  }
+
+  .index-row:last-child { border-bottom: 1px solid var(--line); }
+
+  .index-num {
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-soft);
+    margin-right: 10px;
+  }
+
+  .index-title {
+    font-family: var(--font-display);
+    font-size: clamp(18px, 2vw, 24px);
+    font-weight: 600;
+    color: var(--ink-soft);
+    letter-spacing: -0.01em;
+    transition: color 0.35s ease;
+  }
+
+  .index-year {
+    font-size: 14px;
+    color: var(--ink-soft);
+    transition: color 0.35s ease;
+  }
+
+  .index-row.is-active {
+    position: sticky;
+    top: var(--header-h);
+    background: var(--bg);
+    z-index: 5;
+  }
+
+  .index-row.is-active .index-num,
+  .index-row.is-active .index-title,
+  .index-row.is-active .index-year {
+    color: var(--ink);
+  }
+
+  .index-row.is-active .index-title { font-weight: 800; }
+
+  .index-desc {
+    max-height: 0;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    transition: max-height 0.4s ease, margin-top 0.4s ease;
+  }
+
+  .index-row.is-active .index-desc {
+    max-height: 240px;
+    margin-top: 8px;
+  }
+
+  .index-desc p { margin: 0 0 10px; }
+  .index-desc p:last-child { margin-bottom: 0; }
+
+  /* Right: visual stage */
+/* ---------- Right: sticky visual stage ---------- */
+
+.stage {
+  position: sticky;
+  top: clamp(24px, 6vh, 72px);
+  height: min(72vh, 640px);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.stage-slide {
+  position: absolute;
+  inset: 0;
+
+  opacity: 0;
+  transform: translateY(12px);
+
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+
+  display: flex;
+  align-items: flex-end;
+}
+
+.stage-slide.is-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.stage-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+
+  position: absolute;
+  inset: 0;
+}
+
+.stage-caption {
+  position: relative;
+  z-index: 1;
+  padding: 24px;
+
+  color: #fff;
+  font-size: 14px;
+
+  text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+}
+
+  /* Pure Wine Carthage: full case-study composition, stacked images in normal document flow */
+
+  .stage-slide--composition img {
+    display: block;
+    position: static;
+    inset: auto;
+    width: 100%;
+    height: auto;
+  }
+
+  .stage-slide--composition .case-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .stage-slide--composition .case-row img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* While the composition slide is active, the stage drops out of its sticky/fixed-height
+     behavior so the whole composition renders in normal flow — no internal scrollbar. */
+  .stage.is-expanded {
+    position: static;
+    height: auto;
+    overflow: visible;
+  }
+
+  .stage.is-expanded .stage-slide:not(.is-active) {
+    display: none;
+  }
+
+  .stage.is-expanded .stage-slide.is-active {
+    position: static;
+    inset: auto;
+    opacity: 1;
+    transform: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  /* Invisible scroll driver: one tall block per project behind the sticky stage */
+
+  .track {
+    position: relative;
+  }
+
+  .track-step {
+    height: 60vh;
+  }
+  .track-step:first-child { height: 10vh; }
+  .track-step:last-child { height: 20vh; }
+
+  /* ---------- Mobile: no sticky trickery, plain stacked cards ---------- */
+
+  @media (max-width: 860px) {
+
+  .work {
+    grid-template-columns: 1fr;
+  }
+
+  .index {
+    position: static;
+  }
+
+  .stage {
+    position: static;
+    height: auto;
+    display: none;
+  }
+
+  .index-row {
+    cursor: default;
+  }
+
+  .index-desc {
+    display: none;
+  }
+
+  .index-row.is-active .index-desc {
+    display: block;
+  }
+
+  .mobile-image {
+    display: none;
+    width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    border-radius: 4px;
+    margin-top: 14px;
+    background: var(--bg);
+  }
+
+  .index-row.is-active .mobile-image {
+    display: block;
+  }
+
+}
+
+  @media (min-width: 861px) {
+    .mobile-image { display: none; }
+  }
+</style>
+<link rel="stylesheet" href="tv-noise.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Aller au contenu</a>
+
+  <aside class="sidebar">
+    <button class="hamburger" id="menuToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="menuOverlay">
+      <span></span><span></span><span></span>
+    </button>
+    <a class="mid-stack" href="index.html" aria-label="Retour à l'accueil">
+      <span class="vlabel">PORTFOLIO</span>
+      <span class="vname">MANEL BEN HALIMA</span>
+    </a>
+    <span class="year">© 2026</span>
+  </aside>
+
+  <nav class="menu-overlay" id="menuOverlay" aria-hidden="true">
+    <div class="menu-top">
+      <span class="brand">Manel Ben Halima</span>
+      <button class="menu-close" id="menuClose">FERMER</button>
+    </div>
+    <div class="menu-nav">
+      <a href="index.html#accueil" class="menu-link"><span class="idx">01</span>Accueil</a>
+      <a href="apropos.html" class="menu-link"><span class="idx">02</span>À propos</a>
+      <a href="index.html#travaux" class="menu-link"><span class="idx">03</span>Travaux</a>
+      <a href="index.html#contact" class="menu-link"><span class="idx">04</span>Contact</a>
+    </div>
+    <div class="menu-bottom">
+      <span class="copy">Basée à Montréal</span>
+      <div class="socials">
+        <a href="https://www.linkedin.com/in/manel-ben-halima" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.behance.net/mmanelben" target="_blank" rel="noopener">Behance</a>
+      </div>
+    </div>
+  </nav>
+
+<main class="page" id="main">
+
+<header class="page-head">
+  <h1>Graphique</h1>
+  <p>Identités visuelles, chartes graphiques et campagnes print — huit projets, du concept à la livraison.</p>
+</header>
+
+<div class="work" id="work">
+
+  <!-- ============ LEFT: sticky index ============ -->
+  <div class="index" id="index">
+
+    <!-- Répéter ce bloc pour chacun des 8 projets. data-index doit correspondre à la stage-slide et au track-step du même rang (0 à 7). -->
+
+    <div class="index-row" data-index="0">
+      <div class="index-title">Pure Wine Carthage</div>
+      <div class="index-year">2026</div>
+      <div class="index-desc">
+        <p>L'objectif principal de ce projet était la création d'une identité visuelle forte et mémorable, capable de refléter les valeurs de la marque Pure Wine Carthage. Cela inclut la création d'une étiquette de vin élégante et contemporaine, ainsi que la création d'un univers graphique cohérent, décliné sur différents supports comme la bouteille, le packaging et la signalétique.</p>
+      </div>
+      <img class="mobile-image" src="images/PureWine-Photo1.webp" alt="Pure Wine Carthage" loading="lazy">
+    </div>
+
+    <div class="index-row" data-index="1">
+      <div class="index-title">Nom du projet 02</div>
+      <div class="index-year">2026</div>
+      <div class="index-desc">
+        <p>a) Une phrase sur l'intention du projet et le problème visuel résolu.</p>
+        <p>b) Une phrase sur la structure / l'organisation du contenu.</p>
+        <p>c) Une phrase sur la réalisation technique et ce qui est prévu ensuite.</p>
+      </div>
+      <img class="mobile-image" src="" alt="Nom du projet 02" loading="lazy">
+    </div>
+
+    <div class="index-row" data-index="2">
+      <div class="index-title">Nom du projet 03</div>
+      <div class="index-year">2026</div>
+      <div class="index-desc">
+        <p>a) Une phrase sur l'intention du projet et le problème visuel résolu.</p>
+        <p>b) Une phrase sur la structure / l'organisation du contenu.</p>
+        <p>c) Une phrase sur la réalisation technique et ce qui est prévu ensuite.</p>
+      </div>
+      <img class="mobile-image" src="" alt="Nom du projet 03" loading="lazy">
+    </div>
+
+    <div class="index-row" data-index="3">
+      <div class="index-title">Nom du projet 04</div>
+      <div class="index-year">2025</div>
+      <div class="index-desc">
+        <p>a) Une phrase sur l'intention du projet et le problème visuel résolu.</p>
+        <p>b) Une phrase sur la structure / l'organisation du contenu.</p>
+        <p>c) Une phrase sur la réalisation technique et ce qui est prévu ensuite.</p>
+      </div>
+      <img class="mobile-image" src="" alt="Nom du projet 04" loading="lazy">
+    </div>
+
+    <div class="index-row" data-index="4">
+      <div class="index-title">Nom du projet 05</div>
+      <div class="index-year">2025</div>
+      <div class="index-desc">
+        <p>a) Une phrase sur l'intention du projet et le problème visuel résolu.</p>
+        <p>b) Une phrase sur la structure / l'organisation du contenu.</p>
+        <p>c) Une phrase sur la réalisation technique et ce qui est prévu ensuite.</p>
+      </div>
+      <img class="mobile-image" src="" alt="Nom du projet 05" loading="lazy">
+    </div>
+
+    <div class="index-row" data-index="5">
+      <div class="index-title">Nom du projet 06</div>
+      <div class="index-year">2025</div>
+      <div class="index-desc">
+        <p>a) Une phrase sur l'intention du projet et le problème visuel résolu.</p>
+        <p>b) Une phrase sur la structure / l'organisation du contenu.</p>
+        <p>c) Une phrase sur la réalisation technique et ce qui est prévu ensuite.</p>
+      </div>
+      <img class="mobile-image" src="" alt="Nom du projet 06" loading="lazy">
+    </div>
+
+    <div class="index-row" data-index="6">
+      <div class="index-title">Nom du projet 07</div>
+      <div class="index-year">2025</div>
+      <div class="index-desc">
+        <p>a) Une phrase sur l'intention du projet et le problème visuel résolu.</p>
+        <p>b) Une phrase sur la structure / l'organisation du contenu.</p>
+        <p>c) Une phrase sur la réalisation technique et ce qui est prévu ensuite.</p>
+      </div>
+      <img class="mobile-image" src="" alt="Nom du projet 07" loading="lazy">
+    </div>
+
+    <div class="index-row" data-index="7">
+      <div class="index-title">Nom du projet 08</div>
+      <div class="index-year">2025</div>
+      <div class="index-desc">
+        <p>a) Une phrase sur l'intention du projet et le problème visuel résolu.</p>
+        <p>b) Une phrase sur la structure / l'organisation du contenu.</p>
+        <p>c) Une phrase sur la réalisation technique et ce qui est prévu ensuite.</p>
+      </div>
+      <img class="mobile-image" src="" alt="Nom du projet 08" loading="lazy">
+    </div>
+
+  </div>
+
+  <!-- ============ RIGHT: sticky visual stage + invisible scroll driver ============ -->
+  <div>
+    <div class="stage" id="stage">
+      <div class="stage-slide stage-slide--composition" data-index="0">
+        <img src="images/PureWine-Photo1.webp" alt="Pure Wine Carthage — bannière logo">
+        <div class="case-row">
+          <img src="images/PureWine-Photo2.webp" alt="Pure Wine Carthage — bouteille">
+          <img src="images/PureWine-Photo3.webp" alt="Pure Wine Carthage — palette de couleurs">
+        </div>
+        <img src="images/PureWine-Photo4.webp" alt="Pure Wine Carthage — composition visuelle">
+        <div class="case-row">
+          <img src="images/PureWine-Photo5.webp" alt="Pure Wine Carthage — sac">
+          <img src="images/PureWine-Photo6.webp" alt="Pure Wine Carthage — signalétique">
+        </div>
+        <img src="images/PureWine-Photo7.webp" alt="Pure Wine Carthage — bannière finale">
+      </div>
+      <!-- Projets 02 à 08 : même principe de composition que Pure Wine Carthage (images empilées,
+           alternance pleine largeur / 2 colonnes via .case-row). Nombre d'images et agencement
+           à ajuster manuellement selon les visuels réels de chaque projet : ajouter/retirer une
+           <img> (pleine largeur) ou un <div class="case-row"> (2 colonnes) sans rien casser. -->
+
+      <div class="stage-slide stage-slide--composition" data-index="1">
+        <img src="images/Projet02-Photo1.webp" alt="Nom du projet 02 — visuel 1">
+        <div class="case-row">
+          <img src="images/Projet02-Photo2.webp" alt="Nom du projet 02 — visuel 2">
+          <img src="images/Projet02-Photo3.webp" alt="Nom du projet 02 — visuel 3">
+        </div>
+        <img src="images/Projet02-Photo4.webp" alt="Nom du projet 02 — visuel 4">
+      </div>
+
+      <div class="stage-slide stage-slide--composition" data-index="2">
+        <img src="images/Projet03-Photo1.webp" alt="Nom du projet 03 — visuel 1">
+        <div class="case-row">
+          <img src="images/Projet03-Photo2.webp" alt="Nom du projet 03 — visuel 2">
+          <img src="images/Projet03-Photo3.webp" alt="Nom du projet 03 — visuel 3">
+        </div>
+        <img src="images/Projet03-Photo4.webp" alt="Nom du projet 03 — visuel 4">
+      </div>
+
+      <div class="stage-slide stage-slide--composition" data-index="3">
+        <img src="images/Projet04-Photo1.webp" alt="Nom du projet 04 — visuel 1">
+        <div class="case-row">
+          <img src="images/Projet04-Photo2.webp" alt="Nom du projet 04 — visuel 2">
+          <img src="images/Projet04-Photo3.webp" alt="Nom du projet 04 — visuel 3">
+        </div>
+        <img src="images/Projet04-Photo4.webp" alt="Nom du projet 04 — visuel 4">
+      </div>
+
+      <div class="stage-slide stage-slide--composition" data-index="4">
+        <img src="images/Projet05-Photo1.webp" alt="Nom du projet 05 — visuel 1">
+        <div class="case-row">
+          <img src="images/Projet05-Photo2.webp" alt="Nom du projet 05 — visuel 2">
+          <img src="images/Projet05-Photo3.webp" alt="Nom du projet 05 — visuel 3">
+        </div>
+        <img src="images/Projet05-Photo4.webp" alt="Nom du projet 05 — visuel 4">
+      </div>
+
+      <div class="stage-slide stage-slide--composition" data-index="5">
+        <img src="images/Projet06-Photo1.webp" alt="Nom du projet 06 — visuel 1">
+        <div class="case-row">
+          <img src="images/Projet06-Photo2.webp" alt="Nom du projet 06 — visuel 2">
+          <img src="images/Projet06-Photo3.webp" alt="Nom du projet 06 — visuel 3">
+        </div>
+        <img src="images/Projet06-Photo4.webp" alt="Nom du projet 06 — visuel 4">
+      </div>
+
+      <div class="stage-slide stage-slide--composition" data-index="6">
+        <img src="images/Projet07-Photo1.webp" alt="Nom du projet 07 — visuel 1">
+        <div class="case-row">
+          <img src="images/Projet07-Photo2.webp" alt="Nom du projet 07 — visuel 2">
+          <img src="images/Projet07-Photo3.webp" alt="Nom du projet 07 — visuel 3">
+        </div>
+        <img src="images/Projet07-Photo4.webp" alt="Nom du projet 07 — visuel 4">
+      </div>
+
+      <div class="stage-slide stage-slide--composition" data-index="7">
+        <img src="images/Projet08-Photo1.webp" alt="Nom du projet 08 — visuel 1">
+        <div class="case-row">
+          <img src="images/Projet08-Photo2.webp" alt="Nom du projet 08 — visuel 2">
+          <img src="images/Projet08-Photo3.webp" alt="Nom du projet 08 — visuel 3">
+        </div>
+        <img src="images/Projet08-Photo4.webp" alt="Nom du projet 08 — visuel 4">
+      </div>
+    </div>
+<div>
+
+  <div class="stage" id="stage">
+
+    <div class="stage-slide" data-index="0">
+      <img src="" alt="">
+      <div class="stage-caption">
+        Pure Wine Carthage
+      </div>
+    </div>
+
+    <div class="stage-slide" data-index="1">
+      <img src="" alt="">
+      <div class="stage-caption">
+        Pavillon Lounge
+      </div>
+    </div>
+
+    <div class="stage-slide" data-index="2">
+      <img src="" alt="">
+      <div class="stage-caption">
+        Nom du projet 03
+      </div>
+    </div>
+
+    <div class="stage-slide" data-index="3">
+      <img src="" alt="">
+      <div class="stage-caption">
+        Nom du projet 04
+      </div>
+    </div>
+
+    <div class="stage-slide" data-index="4">
+      <img src="" alt="">
+      <div class="stage-caption">
+        Nom du projet 05
+      </div>
+    </div>
+
+    <div class="stage-slide" data-index="5">
+      <img src="" alt="">
+      <div class="stage-caption">
+        Nom du projet 06
+      </div>
+    </div>
+
+    <div class="stage-slide" data-index="6">
+      <img src="" alt="">
+      <div class="stage-caption">
+        Nom du projet 07
+      </div>
+    </div>
+
+    <div class="stage-slide" data-index="7">
+      <img src="" alt="">
+      <div class="stage-caption">
+        Nom du projet 08
+      </div>
+    </div>
+
+  </div>
+
+</div>
+    
+  </div>
+
+</div>
+
+<script>
+(function () {
+
+  var rows = Array.from(
+    document.querySelectorAll('.index-row')
+  );
+
+  var slides = Array.from(
+    document.querySelectorAll('.stage-slide')
+  );
+
+
+  /* --------------------------------
+     Active un projet
+  -------------------------------- */
+
+  function setActive(index) {
+
+    rows.forEach(function (row) {
+
+      row.classList.toggle(
+        'is-active',
+        row.dataset.index === String(index)
+      );
+
+    });
+
+
+    slides.forEach(function (slide) {
+
+      slide.classList.toggle(
+        'is-active',
+        slide.dataset.index === String(index)
+      );
+
+    });
+
+  }
+
+
+  /* --------------------------------
+     Détection du projet visible
+  -------------------------------- */
+
+  var observer = new IntersectionObserver(
+
+    function (entries) {
+
+      entries.forEach(function (entry) {
+
+        if (entry.isIntersecting) {
+
+          setActive(
+            entry.target.dataset.index
+          );
+
+        }
+
+      });
+
+    },
+
+    {
+      root: null,
+
+      /*
+        Le projet devient actif
+        lorsqu'il traverse le centre
+        de l'écran.
+      */
+      rootMargin: '-45% 0px -45% 0px',
+
+      threshold: 0
+    }
+
+  );
+
+
+  /* Observer les projets de gauche */
+
+  rows.forEach(function (row) {
+
+    observer.observe(row);
+
+  });
+
+
+  /* --------------------------------
+     Click sur un projet
+  -------------------------------- */
+
+  rows.forEach(function (row) {
+
+    row.addEventListener('click', function () {
+
+      var index = row.dataset.index;
+
+      setActive(index);
+
+      row.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+
+    });
+
+  });
+
+
+  /* --------------------------------
+     Projet initial
+  -------------------------------- */
+
+  setActive(0);
+
+})();
+</script>
+
+</main>
+
+<script>
+  (function () {
+    var toggle = document.getElementById('menuToggle');
+    var closeBtn = document.getElementById('menuClose');
+    var overlay = document.getElementById('menuOverlay');
+    var links = overlay.querySelectorAll('.menu-link');
+
+    function openMenu() {
+      overlay.classList.add('is-open');
+      toggle.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+    function closeMenu() {
+      overlay.classList.remove('is-open');
+      toggle.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    toggle.addEventListener('click', function () {
+      overlay.classList.contains('is-open') ? closeMenu() : openMenu();
+    });
+    closeBtn.addEventListener('click', closeMenu);
+    links.forEach(function (link) {
+      link.addEventListener('click', closeMenu);
+    });
+  })();
+</script>
+
+<script src="tv-noise.js"></script>
+</body>
+</html>

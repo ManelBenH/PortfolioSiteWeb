@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Développement — Manel Ben Halima</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Barre latérale + menu (mêmes que la page Graphique) */
+    --sidebar-w: 64px;
+    --sb-ink: #141414;
+    --sb-ink-soft: #55584F;
+    --sb-line: rgba(20, 20, 20, 0.14);
+    --font-display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+
+    --page-bg: #ffffff;
+    --item-w: min(80vh, 760px);
+    --item-ratio: 16 / 9;
+    --item-radius: 8px;
+    --spacing: 20%;      /* décalage vertical entre deux cartes voisines, en % de la hauteur de carte */
+    --angle: 0deg;       /* rotation 3D des cartes voisines (0 = cartes bien à plat, alignées) */
+    --depth: 190px;      /* recul en Z des cartes voisines */
+    --visible: 3;        /* cartes visibles de chaque côté */
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --duration: 600ms;
+
+    --frame-margin: 100px;
+    --frame-radius: 72px;   /* rayon des coins droits du cadre (les coins gauches restent nets) */
+    --frame-border: 3px;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--page-bg);
+    overflow: hidden;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+
+  /* ---- Cadre ----
+     Rectangle avec coins nets à gauche et coins arrondis à droite,
+     comme une carte qui s'ouvre vers la droite. */
+  /* ---- Barre latérale verticale ---- */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: var(--sidebar-w);
+    border-right: 1px solid var(--sb-line);
+    background: var(--page-bg);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+  }
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 22px;
+    padding: 8px;
+    box-sizing: content-box;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .hamburger span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: var(--sb-ink);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .hamburger.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.is-open span:nth-child(2) { opacity: 0; }
+  .hamburger.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .vlabel, .vname, .year {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+  }
+  .vlabel { font-size: 0.7rem; letter-spacing: 0.08em; color: var(--sb-ink-soft); }
+  .vname { font-family: var(--font-display); font-weight: 600; font-size: 0.85rem; color: var(--sb-ink); }
+  .year { font-size: 0.68rem; color: var(--sb-ink-soft); }
+  .mid-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    text-decoration: none;
+  }
+
+  /* ---- Menu plein écran (s'ouvre avec le hamburger) ---- */
+  .menu-overlay {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    left: var(--sidebar-w);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 28px 5vw;
+    background: var(--sb-ink);
+    color: var(--page-bg);
+    transform: translateY(-100%);
+    transition: transform 0.45s cubic-bezier(.2, .7, .2, 1);
+  }
+  .menu-overlay.is-open { transform: translateY(0); }
+  .menu-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .menu-top .brand { font-family: var(--font-display); font-size: 0.85rem; opacity: 0.7; }
+  .menu-close { border: 0; background: none; color: inherit; font-size: 0.85rem; letter-spacing: 0.08em; cursor: pointer; }
+  .menu-nav { display: flex; flex-direction: column; gap: 6px; }
+  .menu-link {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.4;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2rem, 8vw, 4.4rem);
+    line-height: 1.05;
+    transition: opacity 0.2s ease;
+  }
+  .menu-link .idx { font-size: clamp(0.85rem, 1.6vw, 1.1rem); font-weight: 500; opacity: 0.7; }
+  .menu-link:hover, .menu-link:focus-visible { opacity: 1; }
+  .menu-bottom { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; font-size: 0.85rem; }
+  .menu-bottom .copy { opacity: 0.6; }
+  .socials { display: flex; gap: 20px; }
+  .socials a { color: inherit; text-decoration: none; opacity: 0.75; }
+  .socials a:hover, .socials a:focus-visible { opacity: 1; }
+
+  .frame {
+    position: relative;
+    margin: var(--frame-margin);
+    margin-left: calc(var(--sidebar-w) + var(--frame-margin));
+    height: calc(100vh - 2 * var(--frame-margin));
+    height: calc(100dvh - 2 * var(--frame-margin));
+    /* pas de border ici : le contour est redessiné à part (voir .frame-line-*)
+       pour que le trait ne passe jamais sous « Retour » ni sous la nav */
+  }
+
+  /* ---- Contour du cadre, en plusieurs segments indépendants du texte ----
+     a) ligne droite entre "Retour" et "Projet 1"      (position JS)
+     b) petit segment droit juste après "Projet 4"      (position JS)
+     c) coin haut-droit (courbe)                        (position JS, largeur fixe)
+     d) bord droit, ligne verticale                     (fixe)
+     e) coin bas-droit (courbe) + bord bas               (fixe)
+     Chaque segment a ses 2 côtés de bordure de même épaisseur, donc pas de
+     dégradé d'épaisseur dans les courbes, et aucun chevauchement entre eux. */
+  .frame-line-a {
+    position: absolute;
+    top: 0;
+    height: var(--frame-border);
+    background: #141414;
+    z-index: 1;
+  }
+  .frame-line-b {
+    position: absolute;
+    top: 0;
+    right: var(--frame-radius);   /* s'arrête avant le coin, dessiné par .frame-corner-top */
+    height: var(--frame-border);
+    background: #141414;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .frame-corner-top {
+    position: absolute;
+    top: 0; right: 0;
+    width: var(--frame-radius);
+    height: var(--frame-radius);
+    border-top: var(--frame-border) solid #141414;
+    border-right: var(--frame-border) solid #141414;
+    border-radius: 0 var(--frame-radius) 0 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .frame-side-right {
+    position: absolute;
+    top: var(--frame-radius);
+    right: 0;
+    bottom: var(--frame-radius);
+    width: var(--frame-border);
+    background: #141414;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .frame-corner-bottom {
+    position: absolute;
+    right: 0; bottom: 0;
+    width: var(--frame-radius);
+    height: var(--frame-radius);
+    border-bottom: var(--frame-border) solid #141414;
+    border-right: var(--frame-border) solid #141414;
+    border-radius: 0 0 var(--frame-radius) 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .frame-line-bottom {
+    position: absolute;
+    left: 0;
+    right: var(--frame-radius);
+    bottom: 0;
+    height: var(--frame-border);
+    background: #141414;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Zone qui découpe le carrousel (les cartes sont coupées net aux bords),
+     séparée du cadre pour que la nav, elle, ne soit jamais rognée */
+  .frame-clip {
+    position: absolute;
+    inset: 0;
+    border-radius: 0 var(--frame-radius) var(--frame-radius) 0;
+    overflow: hidden;
+    display: flex;
+    align-items: stretch;
+  }
+
+  /* ---- Navigation « Projet 1 / 2 / 3 / 4 » ----
+     Un onglet par projet. Chaque projet a son propre carrousel
+     (rempli par PROJECTS dans le script, en bas de fichier). */
+  .frame-nav {
+    position: absolute;
+    top: 0; right: 0;
+    transform: translateY(-50%);  /* les libellés sont centrés sur la ligne du cadre */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: clamp(0.8rem, 2vw, 1.8rem);
+    padding: 0 clamp(4rem, 8vw, 6.5rem) 0 2.5rem;
+    z-index: 10;
+  }
+  .frame-nav a {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
+    font-size: clamp(0.95rem, 1.25vw, 1.1rem);
+    letter-spacing: 0.08em;
+    color: #141414;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .frame-nav a.is-active {
+    opacity: 1;
+    color: #141414;
+    font-weight: 700;
+  }
+  /* Petit cercle violet devant le projet sélectionné */
+  .frame-nav a.is-active::before {
+    content: "";
+    display: inline-block;
+    width: 0.5em;
+    height: 0.5em;
+    margin-right: 0.5em;
+    border-radius: 50%;
+    background: #626ab3;
+    vertical-align: 0.1em;
+  }
+  .frame-nav a:not(.is-active) { opacity: 0.45; }
+  .frame-nav a:hover { opacity: 1; }
+
+  /* ---- Bouton « Retour » : même ligne que la nav des projets, mais à gauche ---- */
+  .frame-back {
+    position: absolute;
+    top: 0; left: 0;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1.5rem 0 0;
+    font-weight: 700;
+    font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+    letter-spacing: -0.01em;
+    color: rgba(20, 20, 20, 0.7);
+    text-decoration: none;
+    white-space: nowrap;
+    z-index: 10;
+  }
+  .frame-back:hover { color: #141414; }
+  .frame-back-arrow { color: #626ab3; }
+
+  /* ---- Scène du carrousel : colonne de gauche, largeur fixe ---- */
+  .car-stage {
+    flex: 0 0 auto;
+    width: clamp(460px, 54vw, 880px);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 clamp(0.25rem, 1vw, 0.75rem) 0 clamp(1.5rem, 4vw, 3rem);
+    outline: none;
+    touch-action: pan-x;
+    cursor: grab;
+  }
+  .car-stage:active { cursor: grabbing; }
+
+  /* ---- Panneau de texte du projet actif : colonne de droite ---- */
+  .frame-details {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+    padding: 3.5rem clamp(1.5rem, 5vw, 4.5rem) 3rem clamp(2rem, 5vw, 5rem);
+    overflow-y: auto;
+    max-width: none;
+  }
+
+  .frame-details h2 {
+    font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 1.6rem;
+  }
+
+  /* Liste label / valeur, une ligne par info, séparées par un filet fin */
+  .frame-details .meta-list {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+  }
+  .frame-details .meta-row {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid rgba(98, 106, 179, 0.2);
+  }
+  .frame-details .meta-row dt {
+    flex: 0 0 auto;
+    width: 8.5rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #8a8a8a;
+  }
+  .frame-details .meta-row dd {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .frame-details p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #3a3a3a;
+    margin-bottom: 2rem;
+  }
+
+  .frame-details a.details-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #ffffff;
+    background: #626ab3;
+    text-decoration: none;
+    padding: 0.85rem 1.5rem;
+    border-radius: 999px;
+    transition: transform 200ms ease, background 200ms ease;
+  }
+  .frame-details a.details-link:hover {
+    background: #4e5596;
+    transform: translateX(3px);
+  }
+  .frame-details .details-empty {
+    color: #b3b3b3;
+    font-style: italic;
+  }
+
+  @media (max-width: 900px) {
+    .frame-clip { flex-direction: column; }
+    .car-stage { width: 100%; height: 52%; padding: 0 1rem; }
+    .frame-details { padding: 1.5rem 1.5rem 2rem; justify-content: flex-start; }
+  }
+
+  .car-track {
+    position: relative;
+    width: var(--item-w);
+    height: calc(var(--item-w) / (16 / 9));
+    /* La perspective est ici, centrée sur la carte elle-même,
+       plutôt que sur toute la scène (qui est plus large et décalée
+       à gauche) : ça évite que le rendu 3D penche d'un côté. */
+    perspective: 4200px;
+    transform-style: preserve-3d;
+  }
+
+  .car-item {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: var(--item-radius);
+    background: var(--bg, #ddd);
+    color: var(--fg, #111);
+    text-decoration: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    backface-visibility: hidden;
+    transform: translate3d(0, var(--y, 0), var(--z, 0)) rotateX(var(--rot, 0deg)) scale(var(--s, 1));
+    opacity: var(--o, 1);
+    z-index: var(--z-index, 0);
+    pointer-events: var(--pe, auto);
+    will-change: transform, opacity;
+    transition: transform var(--duration) var(--ease), opacity var(--duration) var(--ease);
+  }
+  .car-item.is-jump { transition: none; }
+
+  .car-item > span {
+    position: relative;
+    font-weight: 800;
+    font-size: clamp(0.9rem, 1.6vw, 1.4rem);
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 0 1rem;
+  }
+  .car-item > img,
+  .car-item > video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+  }
+  /* petit voile pour que le libellé reste lisible par-dessus une image/vidéo */
+  .car-item.has-media > span {
+    color: #fff;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  }
+  .car-item.has-media::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.45) 100%);
+    pointer-events: none;
+  }
+
+  @media (max-width: 720px) {
+    :root { --item-w: 52vw; --angle: 0deg; --depth: 100px; --spacing: 34%; --frame-radius: 40px; }
+    .frame-nav { gap: 1rem; }
+    .frame-nav a { font-size: 0.8rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root { --duration: 1ms; }
+  }
+</style>
+
+<!--
+  TV Static Noise Effect — basé sur le travail d'anatravas
+  https://codepen.io/anatravas/pen/vyOwOZ — Licence MIT
+-->
+<style>
+  body {
+    background-color: #ffffff;
+  }
+
+  .tv-noise-wrapper {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .6s ease;
+  }
+
+  .tv-noise-wrapper.is-visible {
+    opacity: 1;
+  }
+
+  .tv-noise {
+    position: absolute;
+    inset: -500px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2' intercept='-.5'/%3E%3CfeFuncG type='linear' slope='2' intercept='-.5'/%3E%3CfeFuncB type='linear' slope='2' intercept='-.5'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 320px 320px;
+    opacity: 0.5;
+    animation: tv-noise 3s steps(8, end) infinite both;
+    will-change: transform;
+  }
+
+  @keyframes tv-noise {
+    0%   { transform: translate(0, 0); }
+    10%  { transform: translate(-100px, 100px); }
+    20%  { transform: translate(150px, -100px); }
+    30%  { transform: translate(-100px, 100px); }
+    40%  { transform: translate(100px, -150px); }
+    50%  { transform: translate(-100px, 200px); }
+    60%  { transform: translate(-200px, -100px); }
+    70%  { transform: translate(50px, 100px); }
+    80%  { transform: translate(100px, -150px); }
+    90%  { transform: translate(0, 200px); }
+    100% { transform: translate(-100px, 100px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tv-noise { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="tv-noise-wrapper" aria-hidden="true">
+    <div class="tv-noise"></div>
+  </div>
+  <!-- Barre latérale verticale (même menu que la page Graphique) -->
+  <aside class="sidebar">
+    <button class="hamburger" id="menuToggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="menuOverlay">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <a class="mid-stack" href="index.html" aria-label="Retour à l'accueil">
+      <span class="vlabel">PORTFOLIO</span>
+      <span class="vname">MANEL BEN HALIMA</span>
+    </a>
+    <span class="year">© 2026</span>
+  </aside>
+
+  <nav class="menu-overlay" id="menuOverlay" aria-hidden="true">
+    <div class="menu-top">
+      <span class="brand">Manel Ben Halima</span>
+      <button class="menu-close" id="menuClose" type="button">FERMER</button>
+    </div>
+    <div class="menu-nav">
+      <a href="index.html#accueil" class="menu-link"><span class="idx">01</span>Accueil</a>
+      <a href="apropos.html" class="menu-link"><span class="idx">02</span>À propos</a>
+      <a href="index.html#travaux" class="menu-link"><span class="idx">03</span>Travaux</a>
+      <a href="index.html#contact" class="menu-link"><span class="idx">04</span>Contact</a>
+    </div>
+    <div class="menu-bottom">
+      <span class="copy">Basée à Montréal</span>
+      <div class="socials">
+        <a href="https://www.linkedin.com/in/manel-ben-halima" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://www.behance.net/mmanelben" target="_blank" rel="noopener noreferrer">Behance</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="frame">
+    <a class="frame-back" href="index.html"><span class="frame-back-arrow" aria-hidden="true">←</span> Retour</a>
+
+    <!-- Générée depuis PROJECTS (voir le script, en bas) : un lien par projet -->
+    <nav class="frame-nav" id="frameNav"></nav>
+
+    <!-- Trait du cadre en 2 segments, positionnés en JS pour ne jamais passer sous le texte -->
+    <div class="frame-line-a" id="frameLineA"></div>
+    <div class="frame-line-b" id="frameLineB"></div>
+    <div class="frame-corner-top"></div>
+    <div class="frame-side-right"></div>
+    <div class="frame-corner-bottom"></div>
+    <div class="frame-line-bottom"></div>
+
+    <!-- Le carrousel + le texte du projet actif sont générés ici depuis PROJECTS -->
+    <div class="frame-clip">
+      <div class="car-stage" id="stage" tabindex="0" aria-label="Projets">
+        <div class="car-track" id="track"></div>
+      </div>
+      <div class="frame-details" id="details"></div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  /* =========================================================================
+     TES PROJETS
+     Un objet par onglet de nav. Chaque projet a son propre tableau `items` :
+     le carrousel qui s'affiche quand on clique sur cet onglet.
+
+     Pour chaque carte (item), trois formats possibles :
+       - image :  { type: 'img',   src: 'images/mon-visuel.jpg', label: 'Nom' }
+       - vidéo :  { type: 'video', src: 'images/ma-video.mp4',   label: 'Nom' }
+                  (la vidéo boucle, sans son, se lit automatiquement)
+       - couleur (le placeholder par défaut) :
+                  { type: 'color', bg: '#e8342a', fg: '#ff8fd0', label: 'Nom' }
+
+     `label` est optionnel : si tu ne veux aucun texte sur la carte, enlève-le
+     ou laisse-le vide (''). Sur une image/vidéo, le libellé passe en blanc
+     avec un léger voile en bas de la carte pour rester lisible.
+     ========================================================================= */
+  // Palette de secours utilisée par les 7 vignettes de chaque projet,
+  // le temps de remplacer chaque placeholder par une vraie image/vidéo.
+  const PLACEHOLDER_COLORS = [
+    { bg: '#e8342a', fg: '#ff8fd0' },
+    { bg: '#e9c6d6', fg: '#ffffff' },
+    { bg: '#141414', fg: '#f2f2f2' },
+    { bg: 'linear-gradient(120deg,#c56bff,#ff9acb 45%,#e7ff3a)', fg: '#141414' },
+    { bg: '#f9b4dc', fg: '#c2185b' },
+    { bg: '#4a0f14', fg: '#ffd6dc' },
+    { bg: '#dcdcdc', fg: '#141414' },
+  ];
+
+  // Construit les 7 cartes d'un projet. Remplace chaque ligne par
+  // { type: 'img', src: 'images/....jpg', label: '...' } ou
+  // { type: 'video', src: 'images/....mp4', label: '...' } au fur et à mesure.
+  function sevenPlaceholders(projectLabel) {
+    return PLACEHOLDER_COLORS.map((c, i) => ({
+      type: 'color',
+      bg: c.bg,
+      fg: c.fg,
+      label: `${projectLabel} — visuel ${i + 1}`,
+    }));
+  }
+
+  /* ---- Texte affiché à droite du carrousel pour chaque projet ----
+     `details` est optionnel : un projet sans `details` affiche juste
+     un espace vide (à compléter plus tard). Pour chaque champ meta,
+     `values` accepte une ou plusieurs lignes. */
+  const PROJECTS = [
+    {
+      name: 'Projet 1',
+      items: [
+        { type: 'img', src: 'images/les-affutes-visuel01.webp', label: 'Projet 1 — visuel 1' },
+        { type: 'img', src: 'images/les-affutes-visuel02.webp', label: 'Projet 1 — visuel 2' },
+        { type: 'img', src: 'images/les-affutes-visuel03.webp', label: 'Projet 1 — visuel 3' },
+        { type: 'img', src: 'images/les-affutes-visuel04.webp', label: 'Projet 1 — visuel 4' },
+        { type: 'img', src: 'images/les-affutes-visuel05.webp', label: 'Projet 1 — visuel 5' },
+        { type: 'img', src: 'images/les-affutes-visuel06.webp', label: 'Projet 1 — visuel 6' },
+        { type: 'img', src: 'images/les-affutes-visuel07.webp', label: 'Projet 1 — visuel 7' },
+        { type: 'img', src: 'images/les-affutes-visuel08.webp', label: 'Projet 1 — visuel 8' },
+        { type: 'video', src: 'video/les-affutes.mp4', label: 'Projet 1 — vidéo' },
+      ],
+      details: {
+        title: 'Les Affûtés',
+        meta: [
+          { label: 'Année',         values: ['2026'] },
+          { label: 'Rôle',          values: ['Design', 'Intégration', 'Développement JavaScript'] },
+          { label: 'Contexte',      values: ["Exercice de formation : refonte d'un site existant"] },
+          { label: 'Technologies',  values: ['HTML · CSS · JavaScript · JSON'] },
+        ],
+        text: "Les Affûtés est un espace montréalais d'ateliers collectifs et de makerspace dédié aux savoir-faire manuels. Pour cet exercice de ma formation en développement front-end, j'ai refait leur site : j'aime beaucoup ce qu'ils font, et j'ai voulu y apporter ma touche personnelle. J'ai conçu le design et l'intégration : une palette vive, un menu latéral en tuiles colorées, une liste d'ateliers filtrable par univers et une fiche détaillée générée dynamiquement pour chaque atelier à partir d'un fichier JSON. J'ai aussi développé un assistant conversationnel qui répond aux questions sur les prix, les dates et les lieux. Les illustrations sont celles du site original.",
+        link: { label: 'voir le code sur GitHub', url: 'https://github.com/ManelBenH/les-affutes' },
+      },
+    },
+    {
+      name: 'Projet 2',
+      items: [
+        { type: 'img', src: 'images/projet2-visuel01.webp', label: 'Projet 2 — visuel 1' },
+        { type: 'img', src: 'images/projet2-visuel02.webp', label: 'Projet 2 — visuel 2' },
+        { type: 'img', src: 'images/projet2-visuel03.webp', label: 'Projet 2 — visuel 3' },
+        { type: 'img', src: 'images/projet2-visuel04.webp', label: 'Projet 2 — visuel 4' },
+        { type: 'img', src: 'images/projet2-visuel05.webp', label: 'Projet 2 — visuel 5' },
+        { type: 'img', src: 'images/projet2-visuel06.webp', label: 'Projet 2 — visuel 6' },
+      ],
+      details: {
+        title: 'CyberCap : Initiative Avenir',
+        meta: [
+          { label: 'Année',         values: ['2026'] },
+          { label: 'Rôle',          values: ['Design, intégration et interactions de la section Participants'] },
+          { label: 'Contexte',      values: ["Projet d'équipe, réalisé en duo pour l'événement GoSec"] },
+          { label: 'Technologies',  values: ['HTML · CSS · JavaScript · JSON'] },
+        ],
+        text: "Initiative Avenir est un programme de CyberCap qui initie les 18-30 ans au numérique. Avec un collègue, j'ai conçu sa page de présentation pour l'événement GoSec. Je me suis occupée de la section Participants, que j'ai voulue vivante et facile à explorer. Les participants défilent horizontalement, et le curseur change pour indiquer qu'il faut glisser. Chaque photo est en noir et blanc, puis retrouve ses couleurs au survol. Un clic ouvre la fiche du participant, et le curseur annonce alors qu'on peut cliquer pour fermer. Ce projet m'a aussi permis de travailler en équipe sur une base de code commune.",
+        link: { label: 'voir le code sur GitHub', url: 'https://github.com/ManelBenH/les-affutes' },
+      },
+    },
+    {
+      name: 'Projet 3',
+      items: [
+        { type: 'img', src: 'images/biblio-visuel01.gif', label: 'Projet 3 — visuel 1' },
+        { type: 'img', src: 'images/biblio-visuel02.webp', label: 'Projet 3 — visuel 2' },
+        { type: 'img', src: 'images/biblio-visuel03.webp', label: 'Projet 3 — visuel 3' },
+      ],
+      details: {
+        title: 'Les Affûtés',
+        meta: [
+          { label: 'Année',         values: ['2026'] },
+          { label: 'Rôle',          values: ['Design', 'Intégration', 'Développement JavaScript'] },
+          { label: 'Contexte',      values: ["Exercice de formation : refonte d'un site existant"] },
+          { label: 'Technologies',  values: ['HTML · CSS · JavaScript · JSON'] },
+        ],
+        text: "Les Affûtés est un espace montréalais d'ateliers collectifs et de makerspace dédié aux savoir-faire manuels. Pour cet exercice de ma formation en développement front-end, j'ai refait leur site : j'aime beaucoup ce qu'ils font, et j'ai voulu y apporter ma touche personnelle. J'ai conçu le design et l'intégration : une palette vive, un menu latéral en tuiles colorées, une liste d'ateliers filtrable par univers et une fiche détaillée générée dynamiquement pour chaque atelier à partir d'un fichier JSON. J'ai aussi développé un assistant conversationnel qui répond aux questions sur les prix, les dates et les lieux. Les illustrations sont celles du site original.",
+        link: { label: 'voir le code sur GitHub', url: 'https://github.com/ManelBenH/les-affutes' },
+      },
+    },
+    {
+      name: 'Projet 4',
+      items: sevenPlaceholders('Projet 4'),
+      details: {
+        title: 'Les Affûtés',
+        meta: [
+          { label: 'Année',         values: ['2026'] },
+          { label: 'Rôle',          values: ['Design', 'Intégration', 'Développement JavaScript'] },
+          { label: 'Contexte',      values: ["Exercice de formation : refonte d'un site existant"] },
+          { label: 'Technologies',  values: ['HTML · CSS · JavaScript · JSON'] },
+        ],
+        text: "Les Affûtés est un espace montréalais d'ateliers collectifs et de makerspace dédié aux savoir-faire manuels. Pour cet exercice de ma formation en développement front-end, j'ai refait leur site : j'aime beaucoup ce qu'ils font, et j'ai voulu y apporter ma touche personnelle. J'ai conçu le design et l'intégration : une palette vive, un menu latéral en tuiles colorées, une liste d'ateliers filtrable par univers et une fiche détaillée générée dynamiquement pour chaque atelier à partir d'un fichier JSON. J'ai aussi développé un assistant conversationnel qui répond aux questions sur les prix, les dates et les lieux. Les illustrations sont celles du site original.",
+        link: { label: 'voir le code sur GitHub', url: 'https://github.com/ManelBenH/les-affutes' },
+      },
+    },
+  ];
+  // Exemple avec de vraies images / vidéos, une fois prêtes :
+  // {
+  //   name: 'Projet 1',
+  //   items: [
+  //     { type: 'img',   src: 'images/coochie-01.jpg', label: 'It’s all coochie' },
+  //     { type: 'video', src: 'images/coochie-02.mp4', label: 'It’s all coochie' },
+  //     // ... jusqu'à 7 cartes
+  //   ],
+  // },
+
+  const stage    = document.getElementById('stage');
+  const track    = document.getElementById('track');
+  const navEl    = document.getElementById('frameNav');
+  const detailsEl = document.getElementById('details');
+
+  const VISIBLE   = 3;     // doit correspondre à --visible en CSS
+  const LOCK_MS   = 380;
+  const DRAG_THRESHOLD = 40; // px avant de déclencher un changement au relâchement
+
+  let projectIndex = 0;
+  let items = [];
+  let n = 0;
+  let active = 0;
+  let prevD = [];
+  let locked = false;
+
+  /* ---- Construit la nav à partir de PROJECTS ---- */
+  PROJECTS.forEach((p, i) => {
+    const a = document.createElement('a');
+    a.href = '#';
+    a.textContent = p.name;
+    a.dataset.project = i;
+    navEl.appendChild(a);
+  });
+  const navLinks = [...navEl.querySelectorAll('a')];
+
+  function updateNav() {
+    navLinks.forEach((a, i) => a.classList.toggle('is-active', i === projectIndex));
+  }
+
+  /* ---- Construit les cartes du projet actif ---- */
+  function buildCard(data) {
+    const el = document.createElement('a');
+    el.className = 'car-item';
+    el.href = '#';
+
+    if (data.type === 'img') {
+      el.classList.add('has-media');
+      const img = document.createElement('img');
+      img.src = data.src;
+      img.alt = data.label || '';
+      el.appendChild(img);
+    } else if (data.type === 'video') {
+      el.classList.add('has-media');
+      const video = document.createElement('video');
+      video.src = data.src;
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+      el.appendChild(video);
+    } else {
+      el.style.setProperty('--bg', data.bg || '#ddd');
+      el.style.setProperty('--fg', data.fg || '#111');
+    }
+
+    return el;
+  }
+
+  /* ---- Construit le texte à droite (titre, meta, paragraphe, lien) ---- */
+  function renderDetails(details) {
+    detailsEl.innerHTML = '';
+    if (!details) {
+      const empty = document.createElement('p');
+      empty.className = 'details-empty';
+      empty.textContent = 'Texte à venir pour ce projet.';
+      detailsEl.appendChild(empty);
+      return;
+    }
+
+    const h2 = document.createElement('h2');
+    h2.textContent = details.title;
+    detailsEl.appendChild(h2);
+
+    if (details.meta && details.meta.length) {
+      const dl = document.createElement('dl');
+      dl.className = 'meta-list';
+      details.meta.forEach((m) => {
+        const row = document.createElement('div');
+        row.className = 'meta-row';
+        const dt = document.createElement('dt');
+        dt.textContent = m.label;
+        const dd = document.createElement('dd');
+        dd.textContent = m.values.join(', ');
+        row.appendChild(dt);
+        row.appendChild(dd);
+        dl.appendChild(row);
+      });
+      detailsEl.appendChild(dl);
+    }
+
+    if (details.text) {
+      const p = document.createElement('p');
+      p.textContent = details.text;
+      detailsEl.appendChild(p);
+    }
+
+    if (details.link) {
+      const a = document.createElement('a');
+      a.className = 'details-link';
+      a.href = details.link.url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = `↗ ${details.link.label}`;
+      detailsEl.appendChild(a);
+    }
+  }
+
+  function loadProject(index) {
+    projectIndex = ((index % PROJECTS.length) + PROJECTS.length) % PROJECTS.length;
+    const data = PROJECTS[projectIndex].items;
+
+    renderDetails(PROJECTS[projectIndex].details);
+    track.innerHTML = '';
+    items = data.map(buildCard);
+    items.forEach((el, i) => {
+      track.appendChild(el);
+      el.addEventListener('click', (e) => {
+        if (i !== active) { e.preventDefault(); goTo(i); }
+      });
+    });
+
+    n = items.length;
+    active = 0;
+    prevD = items.map((_, i) => i);
+
+    updateNav();
+    layout();
+  }
+
+  const rel = (i) => {
+    let d = (i - active) % n;
+    if (d > n / 2) d -= n;
+    if (d < -n / 2) d += n;
+    return d;
+  };
+
+  function px(varName) {
+    const h = items[0] ? items[0].offsetHeight : track.offsetHeight;
+    const raw = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    return raw.endsWith('%') ? (parseFloat(raw) / 100) * h : parseFloat(raw);
+  }
+
+  function layout(dragOffset = 0) {
+    if (n === 0) return;
+    const spacing = px('--spacing');
+    const angle   = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--angle'));
+    const depth   = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--depth'));
+    const dragItems = dragOffset / (items[0].offsetHeight || 1); // fraction de carte
+
+    items.forEach((item, i) => {
+      const d = rel(i) - dragItems;
+      const a = Math.min(Math.abs(d), VISIBLE + 1);
+      const dir = Math.sign(d);
+
+      const y = `${d * spacing}px`;
+      const z = -a * depth;
+      const rot = dir * Math.min(a, 1) * angle;
+      const s = Math.max(1 - a * 0.16, 0.4);
+      const o = a > VISIBLE ? 0 : 1;                  // pas de fondu : opaque tant que visible, coupé net au-delà
+      const zIndex = Math.round(100 - a * 10);
+
+      const jumped = Math.abs(rel(i) - prevD[i]) > n / 2;
+      item.classList.toggle('is-jump', jumped);
+      prevD[i] = rel(i);
+
+      item.style.setProperty('--y', y);
+      item.style.setProperty('--z', `${z}px`);
+      item.style.setProperty('--rot', `${rot}deg`);
+      item.style.setProperty('--s', s);
+      item.style.setProperty('--o', o);
+      item.style.setProperty('--z-index', zIndex);
+      item.style.setProperty('--pe', a > VISIBLE ? 'none' : 'auto');
+      item.classList.toggle('is-active', Math.round(rel(i) - dragItems) === 0 && Math.abs(d) < 0.5);
+    });
+  }
+
+  function go(step) {
+    if (locked || n === 0) return;
+    locked = true;
+    active = ((active + step) % n + n) % n;
+    layout();
+    setTimeout(() => { locked = false; }, LOCK_MS);
+  }
+  function goTo(i) {
+    if (i === active || locked || n === 0) return;
+    active = i;
+    layout();
+  }
+
+  /* ---- Molette : fait défiler les cartes du projet actif ---- */
+  stage.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    if (Math.abs(e.deltaY) < 4) return;
+    go(e.deltaY > 0 ? 1 : -1);
+  }, { passive: false });
+
+  /* ---- Clavier ---- */
+  stage.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+    if (e.key === 'ArrowUp'   || e.key === 'ArrowLeft')  { e.preventDefault(); go(-1); }
+  });
+
+  /* ---- Glisser / swipe (souris + tactile) ---- */
+  let dragging = false, startY = 0, currentDrag = 0;
+
+  function dragStart(y) {
+    if (locked) return;
+    dragging = true;
+    startY = y;
+    stage.classList.add('is-dragging');
+  }
+  function dragMove(y) {
+    if (!dragging) return;
+    currentDrag = y - startY;
+    layout(-currentDrag); // glisser vers le haut avance (comme la pile physique)
+  }
+  function dragEnd() {
+    if (!dragging) return;
+    dragging = false;
+    stage.classList.remove('is-dragging');
+    if (Math.abs(currentDrag) > DRAG_THRESHOLD) {
+      go(currentDrag > 0 ? -1 : 1);
+    } else {
+      layout();
+    }
+    currentDrag = 0;
+  }
+
+  stage.addEventListener('pointerdown', (e) => { stage.setPointerCapture(e.pointerId); dragStart(e.clientY); });
+  stage.addEventListener('pointermove', (e) => dragMove(e.clientY));
+  stage.addEventListener('pointerup', dragEnd);
+  stage.addEventListener('pointercancel', dragEnd);
+
+  /* ---- Clic sur un onglet « Projet N » : charge son propre carrousel ---- */
+  navLinks.forEach((a, i) => a.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (i !== projectIndex) loadProject(i);
+  }));
+
+  new ResizeObserver(() => layout()).observe(track);
+
+  /* ---- Positionne les 2 segments du trait du cadre d'après la taille réelle
+     de « Retour » et de la nav, pour qu'il ne passe jamais sous le texte ---- */
+  const frameEl  = document.querySelector('.frame');
+  const backEl   = document.querySelector('.frame-back');
+  const lineA    = document.getElementById('frameLineA');
+  const lineB    = document.getElementById('frameLineB');
+
+  const NAV_GAP       = 16; // px d'espace vide avant "Projet 1"
+  const NAV_GAP_AFTER = 32; // px d'espace vide après "Projet 4", avant la courbe
+
+  function layoutFrameLines() {
+    const frameRect = frameEl.getBoundingClientRect();
+    const backRect  = backEl.getBoundingClientRect();
+    const firstLink = navLinks[0];
+    const lastLink  = navLinks[navLinks.length - 1];
+    if (!firstLink || !lastLink) return;
+    const navStartRect = firstLink.getBoundingClientRect();
+    const navEndRect   = lastLink.getBoundingClientRect();
+
+    const backEndX  = backRect.right - frameRect.left;
+    const navStartX = navStartRect.left - frameRect.left - NAV_GAP;
+    const navEndX   = navEndRect.right - frameRect.left + NAV_GAP_AFTER;
+
+    lineA.style.left  = backEndX + 'px';
+    lineA.style.width = Math.max(0, navStartX - backEndX) + 'px';
+    lineB.style.left  = navEndX + 'px';
+  }
+
+  window.addEventListener('resize', layoutFrameLines);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(layoutFrameLines);
+  }
+
+  /* ---- projet-dev.html?projet=2 ouvre directement le Projet 2 (Projet 1 par défaut) ---- */
+  const startProject = parseInt(new URLSearchParams(location.search).get('projet'), 10);
+  loadProject(startProject >= 1 && startProject <= PROJECTS.length ? startProject - 1 : 0);
+  layoutFrameLines();
+})();
+
+/* ---- Menu de la barre latérale ---- */
+(() => {
+  const toggle = document.getElementById('menuToggle');
+  const closeBtn = document.getElementById('menuClose');
+  const overlay = document.getElementById('menuOverlay');
+
+  function setOpen(open) {
+    overlay.classList.toggle('is-open', open);
+    toggle.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
+    overlay.setAttribute('aria-hidden', String(!open));
+  }
+
+  toggle.addEventListener('click', () => setOpen(!overlay.classList.contains('is-open')));
+  closeBtn.addEventListener('click', () => setOpen(false));
+  overlay.querySelectorAll('.menu-link').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+})();
+</script>
+
+<script>
+  window.addEventListener('load', function () {
+    document.querySelector('.tv-noise-wrapper').classList.add('is-visible');
+  });
+</script>
+</body>
+</html>

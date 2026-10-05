@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>À propos — Manel Ben Halima</title>
+<meta name="description" content="Présentation et compétences de Manel Ben Halima, designer graphique &amp; motion designer basée à Montréal, en transition vers le développement front-end.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ---------- Design tokens ---------- */
+  :root {
+    --sidebar-w: 64px;
+    --bg: #ffffff;
+    --bg-raised: #F5F5F1;
+    --ink: #1B1D1B;
+    --ink-soft: #55584f;
+    --line: rgba(27, 29, 27, 0.14);
+    --accent: #3B2FE0;
+    --font-display: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    --font-body: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+    --skill-1: #FF6B57;
+    --skill-2: #FFB800;
+    --skill-3: #00C2A8;
+    --skill-4: #3B82F6;
+    --skill-5: #A855F7;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+  h1, h2, h3 { font-family: var(--font-display); margin: 0; letter-spacing: -0.01em; }
+  p { margin: 0; }
+  button { font: inherit; color: inherit; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .skip-link {
+    position: absolute;
+    left: -999px;
+    top: 0;
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 16px;
+    z-index: 300;
+  }
+  .skip-link:focus {
+    left: var(--sidebar-w);
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--sidebar-w);
+    border-right: 1px solid var(--line);
+    background: var(--bg);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+  }
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 22px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .hamburger span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: var(--ink);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .hamburger.is-open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .hamburger.is-open span:nth-child(2) { opacity: 0; }
+  .hamburger.is-open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  .vlabel, .vname, .year {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+  }
+  .vlabel { font-size: 0.7rem; letter-spacing: 0.08em; color: var(--ink-soft); }
+  .vname { font-family: var(--font-display); font-weight: 600; font-size: 0.85rem; }
+  .year { font-size: 0.68rem; color: var(--ink-soft); }
+  .mid-stack { display: flex; flex-direction: column; align-items: center; gap: 28px; text-decoration: none; }
+
+  /* ---------- Menu overlay ---------- */
+  .menu-overlay {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    left: var(--sidebar-w);
+    background: var(--ink);
+    color: var(--bg);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 28px 5vw;
+    transform: translateY(-100%);
+    transition: transform 0.45s cubic-bezier(.2,.7,.2,1);
+  }
+  .menu-overlay.is-open { transform: translateY(0); }
+
+  .menu-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .menu-top .brand { font-family: var(--font-display); font-size: 0.85rem; opacity: 0.7; }
+  .menu-close { background: none; border: none; color: inherit; font-size: 0.85rem; letter-spacing: 0.08em; cursor: pointer; }
+
+  .menu-nav { display: flex; flex-direction: column; gap: 6px; }
+  .menu-link {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    text-decoration: none;
+    opacity: 0.4;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2rem, 8vw, 4.4rem);
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+    transition: opacity 0.2s ease;
+  }
+  .menu-link .idx { font-size: clamp(0.85rem, 1.6vw, 1.1rem); font-weight: 500; opacity: 0.7; }
+  .menu-link:hover, .menu-link:focus-visible, .menu-link.is-active { opacity: 1; }
+
+  .menu-bottom { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; font-size: 0.85rem; }
+  .menu-bottom .copy { opacity: 0.6; }
+  .socials { display: flex; gap: 20px; }
+  .socials a { text-decoration: none; opacity: 0.75; }
+  .socials a:hover, .socials a:focus-visible { opacity: 1; }
+
+  /* ---------- Layout ---------- */
+  .page { margin-left: var(--sidebar-w); }
+  section { padding: 96px 6vw; }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; margin-bottom: 48px; flex-wrap: wrap; }
+  .section-num { font-family: var(--font-display); font-size: 0.85rem; color: var(--ink-soft); }
+  .section-title { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 600; margin-bottom: 28px; }
+
+  /* ---------- About ---------- */
+  .about-text { max-width: 62ch; font-size: 1.15rem; color: var(--ink-soft); }
+
+  .nav-link-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 28px;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding-bottom: 6px;
+    width: fit-content;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .nav-link-arrow .arrow { transition: transform 0.2s ease; }
+  .nav-link-arrow:hover, .nav-link-arrow:focus-visible { color: var(--accent); border-color: var(--accent); }
+  .nav-link-arrow:hover .arrow, .nav-link-arrow:focus-visible .arrow { transform: translateX(-6px); }
+
+  /* ---------- Compétences (roue radiale) ---------- */
+  #competences {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .skills-intro { max-width: 46ch; color: var(--ink-soft); font-size: 1.05rem; margin-bottom: 56px; }
+
+  .wheel-wrap { display: flex; align-items: center; justify-content: space-between; gap: 48px; flex-wrap: wrap; }
+  .wheel-field {
+    position: relative;
+    width: min(320px, 39vw);
+    height: min(640px, 78vw);
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: grab;
+    flex: none;
+  }
+  .wheel-field.is-dragging { cursor: grabbing; }
+  .wheel-guide {
+    position: absolute;
+    left: 40px;
+    right: 0;
+    top: 40px;
+    bottom: 40px;
+    border-style: dashed;
+    border-width: 1px 0 1px 1px;
+    border-color: var(--line);
+    border-radius: 100% 0 0 100% / 50% 0 0 50%;
+    pointer-events: none;
+  }
+  .wheel-center { position: absolute; right: 0; top: 50%; width: 8px; height: 8px; margin: -4px -4px 0 0; border-radius: 50%; background: var(--line); }
+  .wheel { position: absolute; inset: 0; }
+  .wheel-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 64px;
+    height: 64px;
+    margin: -32px 0 0 -32px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 8px 20px -10px rgba(0,0,0,0.4);
+    transition: transform 460ms cubic-bezier(.22,1,.36,1), opacity 280ms ease;
+    will-change: transform;
+  }
+
+  .skill-panel {
+    flex: 1 1 320px;
+    max-width: 420px;
+    min-height: 220px;
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    padding: 24px;
+  }
+  .skill-panel h3 { font-size: 1.2rem; margin-bottom: 10px; }
+  .skill-panel p { font-size: 0.92rem; color: var(--ink-soft); margin-bottom: 16px; }
+  .tool-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; }
+  .tool-list li { display: flex; align-items: center; gap: 10px; }
+  .tool-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    flex: none;
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    font-weight: 700;
+    border-radius: 40% 60% 55% 45% / 45% 40% 60% 55%;
+  }
+
+  .skills-cards { display: none; }
+
+  @media (max-width: 760px) {
+    .wheel-wrap { display: none; }
+    .skills-cards {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 8px;
+      margin: 0 -6vw;
+      padding-left: 6vw;
+      padding-right: 6vw;
+      -webkit-overflow-scrolling: touch;
+    }
+    .skill-card {
+      scroll-snap-align: center;
+      flex: 0 0 82%;
+      background: var(--bg-raised);
+      border: 1px solid var(--line);
+      padding: 24px;
+    }
+    .skill-card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .skill-card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    .skill-card p { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 14px; }
+  }
+
+  .apropos-footer { border-bottom: none; }
+
+  @media (max-width: 640px) {
+    section { padding: 64px 6vw; }
+  }
+</style>
+<link rel="stylesheet" href="tv-noise.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Aller au contenu</a>
+
+  <aside class="sidebar">
+    <button class="hamburger" id="menuToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="menuOverlay">
+      <span></span><span></span><span></span>
+    </button>
+    <a class="mid-stack" href="index.html" aria-label="Retour à l'accueil">
+      <span class="vlabel">PORTFOLIO</span>
+      <span class="vname">MANEL BEN HALIMA</span>
+    </a>
+    <span class="year">© 2026</span>
+  </aside>
+
+  <nav class="menu-overlay" id="menuOverlay" aria-hidden="true">
+    <div class="menu-top">
+      <span class="brand">Manel Ben Halima</span>
+      <button class="menu-close" id="menuClose">FERMER</button>
+    </div>
+    <div class="menu-nav">
+      <a href="#apropos" class="menu-link" data-section="apropos"><span class="idx">01</span>À propos</a>
+      <a href="#competences" class="menu-link" data-section="competences"><span class="idx">02</span>Compétences</a>
+      <a href="index.html#travaux" class="menu-link"><span class="idx">03</span>Travaux</a>
+      <a href="index.html#contact" class="menu-link"><span class="idx">04</span>Contact</a>
+    </div>
+    <div class="menu-bottom">
+      <span class="copy">Basée à Montréal</span>
+      <div class="socials">
+        <a href="https://www.linkedin.com/in/manel-ben-halima" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.behance.net/mmanelben" target="_blank" rel="noopener">Behance</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="page" id="main">
+
+    <section id="apropos">
+      <div class="section-head">
+        <span class="section-num">01 — À propos</span>
+      </div>
+      <h1 class="section-title">Passionnée de design depuis près de dix ans</h1>
+      <p class="about-text">Tout a commencé avec un diplôme en design obtenu en 2016. Depuis, je n’ai jamais vraiment arrêté de créer, d’animer et de recommencer. Un logo qui prend vie, une charte qui tient debout, une animation qui donne le rythme juste : c'est ce langage-là que je parle le mieux. J’ajoute aujourd’hui une nouvelle corde à mon arc, le code, en particulier le HTML, le CSS et le JavaScript, pour élargir ma vision et rester polyvalente. Je suis actuellement à la recherche d’un emploi en développement Web et en création de contenu numérique, où je pourrai mettre à profit ma créativité et mes compétences techniques.</p>
+    </section>
+
+    <section id="competences">
+      <div class="section-head">
+        <span class="section-num">02 — Compétences</span>
+      </div>
+      <p class="skills-intro">Cinq univers, une seule curiosité — faites glisser la roue ou touchez un point.</p>
+
+      <div class="wheel-wrap">
+        <div class="skill-panel" id="skillPanel">
+          <h3 id="skillPanelTitle"></h3>
+          <p id="skillPanelText"></p>
+          <ul class="tool-list" id="skillPanelTools"></ul>
+        </div>
+        <div class="wheel-field" id="wheelField">
+          <div class="wheel-guide"></div>
+          <div class="wheel-center"></div>
+          <div class="wheel" id="wheel"></div>
+        </div>
+      </div>
+
+      <div class="skills-cards" id="skillsCards"></div>
+    </section>
+
+    <footer class="apropos-footer">
+      <a class="nav-link-arrow" href="index.html">
+        <span class="arrow" aria-hidden="true">←</span>
+        <span>Retour à l'accueil</span>
+      </a>
+    </footer>
+
+  </main>
+
+<script>
+  (function () {
+    var toggle = document.getElementById('menuToggle');
+    var closeBtn = document.getElementById('menuClose');
+    var overlay = document.getElementById('menuOverlay');
+    var links = overlay.querySelectorAll('.menu-link');
+
+    function openMenu() {
+      overlay.classList.add('is-open');
+      toggle.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+    function closeMenu() {
+      overlay.classList.remove('is-open');
+      toggle.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    toggle.addEventListener('click', function () {
+      overlay.classList.contains('is-open') ? closeMenu() : openMenu();
+    });
+    closeBtn.addEventListener('click', closeMenu);
+    links.forEach(function (link) {
+      link.addEventListener('click', closeMenu);
+    });
+
+    var sections = Array.prototype.map.call(links, function (link) {
+      return link.dataset.section ? document.getElementById(link.dataset.section) : null;
+    });
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          links.forEach(function (link) {
+            link.classList.toggle('is-active', link.dataset.section === entry.target.id);
+          });
+        });
+      }, { rootMargin: '-40% 0px -55% 0px' });
+      sections.forEach(function (section) {
+        if (section) observer.observe(section);
+      });
+    }
+  })();
+
+  (function () {
+    var field = document.getElementById('wheelField');
+    if (!field) return;
+    var wheel = document.getElementById('wheel');
+    var cardsWrap = document.getElementById('skillsCards');
+    var panelTitle = document.getElementById('skillPanelTitle');
+    var panelText = document.getElementById('skillPanelText');
+    var panelTools = document.getElementById('skillPanelTools');
+
+    var skills = [
+      {
+        id: 'photo', emoji: '📷', label: 'Photo', color: 'var(--skill-1)',
+        text: "Sélection, retouche et mise en valeur d'images, de la prise de vue à la livraison.",
+        tools: [
+          { mono: 'Lr', color: '#2FB4C9', name: 'Lightroom' },
+          { mono: 'Ps', color: '#33C7F4', name: 'Photoshop (retouche)' }
+        ]
+      },
+      {
+        id: 'design', emoji: '🎨', label: 'Design graphique', color: 'var(--skill-2)',
+        text: 'Identités visuelles, chartes graphiques et mise en page, du logo au support imprimé.',
+        tools: [
+          { mono: 'Ps', color: '#33C7F4', name: 'Photoshop' },
+          { mono: 'Ai', color: '#FF8A34', name: 'Illustrator' },
+          { mono: 'Id', color: '#FF4470', name: 'InDesign' }
+        ]
+      },
+      {
+        id: 'motion', emoji: '🎬', label: 'Motion design', color: 'var(--skill-3)',
+        text: 'Animations 2D et vidéos promotionnelles qui donnent du rythme à une marque.',
+        tools: [
+          { mono: 'Ae', color: '#B15FFF', name: 'After Effects' },
+          { mono: 'Pr', color: '#6E6FFF', name: 'Adobe Premiere Pro' }
+        ]
+      },
+      {
+        id: 'dev', emoji: '💻', label: 'Dev', color: 'var(--skill-4)',
+        text: 'Des bases solides pour prototyper mes idées et dialoguer avec les équipes techniques.',
+        tools: [
+          { mono: 'H', color: '#E44D26', name: 'HTML' },
+          { mono: 'C', color: '#2965F1', name: 'CSS' },
+          { mono: 'JS', color: '#F0DB4F', dark: true, name: 'JavaScript' },
+          { mono: 'Git', color: '#F1502F', name: 'Git' },
+          { mono: 'Gh', color: '#24292E', name: 'GitHub' }
+        ]
+      },
+      {
+        id: 'ia', emoji: '🤖', label: 'IA', color: 'var(--skill-5)',
+        text: "Des outils d'IA intégrés à mon flux de travail pour aller plus vite, sans perdre en exigence.",
+        tools: [
+          { mono: 'AI', color: '#7C5CFC', name: "Outils d'IA génératifs" },
+          { mono: 'Sec', color: '#16A34A', name: 'Notions de cybersécurité' }
+        ]
+      }
+    ];
+
+    var N = skills.length;
+    var ACTIVE_SLOT = 2;
+    var items = [];
+
+    skills.forEach(function (skill, i) {
+      var item = document.createElement('button');
+      item.className = 'wheel-item';
+      item.style.background = skill.color;
+      item.setAttribute('aria-label', skill.label);
+      item.innerHTML = '<span aria-hidden="true">' + skill.emoji + '</span>';
+      item.addEventListener('click', function () { shiftBy(1); });
+      wheel.appendChild(item);
+      items.push(item);
+
+      var card = document.createElement('article');
+      card.className = 'skill-card';
+      var icon = document.createElement('div');
+      icon.className = 'skill-card-icon';
+      icon.style.background = skill.color;
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = skill.emoji;
+      var h3 = document.createElement('h3');
+      h3.textContent = skill.label;
+      var p = document.createElement('p');
+      p.textContent = skill.text;
+      var ul = document.createElement('ul');
+      ul.className = 'tool-list';
+      skill.tools.forEach(function (t) { ul.appendChild(buildToolItem(t)); });
+      card.appendChild(icon);
+      card.appendChild(h3);
+      card.appendChild(p);
+      card.appendChild(ul);
+      cardsWrap.appendChild(card);
+    });
+
+    function buildToolItem(t) {
+      var li = document.createElement('li');
+      var badge = document.createElement('span');
+      badge.className = 'tool-badge';
+      badge.style.background = t.color;
+      if (t.dark) badge.style.color = '#1B1D1B';
+      badge.textContent = t.mono;
+      li.appendChild(badge);
+      li.appendChild(document.createTextNode(t.name));
+      return li;
+    }
+
+    // 5 emplacements fixes sur l'arc, calculés une fois (jamais recalculés pendant l'interaction).
+    var slotAngle = [];
+    for (var k = 0; k < N; k++) slotAngle.push(270 - k * (180 / (N - 1)));
+    var slotPos = [];
+
+    function computeSlots() {
+      var rect = field.getBoundingClientRect();
+      var cx = rect.width, cy = rect.height / 2;
+      var radius = rect.width - 40;
+      slotPos = slotAngle.map(function (angleDeg) {
+        var rad = angleDeg * Math.PI / 180;
+        return { x: cx + radius * Math.cos(rad), y: cy + radius * Math.sin(rad) };
+      });
+    }
+
+    // offset: index de rotation. L'icône affichée à l'emplacement k est skills[(k + offset) % N].
+    var offset = 0;
+    var activeIndex = -1;
+
+    function slotOfSkill(i) {
+      return ((i - offset) % N + N) % N;
+    }
+
+    var DEFAULT_TRANSITION = '';
+    var WRAP_ENTRY_TRANSITION = 'transform 300ms cubic-bezier(.22,1,.36,1)';
+    var WRAP_ENTRY_OFFSET = 70;
+
+    function clearWrap(item) {
+      if (item.__wrapTimer) { clearTimeout(item.__wrapTimer); item.__wrapTimer = null; }
+      if (item.__wrapHandler) { item.removeEventListener('transitionend', item.__wrapHandler); item.__wrapHandler = null; }
+      if (item.__wrapRaf) { cancelAnimationFrame(item.__wrapRaf); item.__wrapRaf = null; }
+    }
+
+    function animateWrap(item, finalPos, scale, opacity, direction) {
+      clearWrap(item);
+      item.style.transition = 'none';
+      item.style.visibility = 'hidden';
+      item.style.opacity = String(opacity);
+      item.style.zIndex = '1';
+      var entryY = direction === 1 ? (finalPos.y - WRAP_ENTRY_OFFSET) : (finalPos.y + WRAP_ENTRY_OFFSET);
+      item.style.transform = 'translate(' + finalPos.x + 'px,' + entryY + 'px) scale(' + scale + ')';
+      item.getBoundingClientRect();
+      item.__wrapRaf = requestAnimationFrame(function () {
+        item.__wrapRaf = null;
+        item.style.visibility = 'visible';
+        item.style.transition = WRAP_ENTRY_TRANSITION;
+        item.style.transform = 'translate(' + finalPos.x + 'px,' + finalPos.y + 'px) scale(' + scale + ')';
+        var toEnd = function () {
+          clearWrap(item);
+          item.style.transition = DEFAULT_TRANSITION;
+        };
+        item.__wrapHandler = toEnd;
+        item.addEventListener('transitionend', toEnd);
+        item.__wrapTimer = setTimeout(toEnd, 380);
+      });
+    }
+
+    function applyLayout(prevOffset) {
+      items.forEach(function (item, i) {
+        var k = slotOfSkill(i);
+        var pos = slotPos[k];
+        var isActive = k === ACTIVE_SLOT;
+        var scale = isActive ? 1.18 : 0.75;
+        var opacity = isActive ? 1 : 0.4;
+
+        var isWrap = false, direction = 0;
+        if (prevOffset !== undefined) {
+          var prevK = ((i - prevOffset) % N + N) % N;
+          if (prevK === 0 && k === N - 1) { isWrap = true; direction = 1; }
+          else if (prevK === N - 1 && k === 0) { isWrap = true; direction = -1; }
+        }
+
+        if (isWrap) {
+          animateWrap(item, pos, scale, opacity, direction);
+        } else {
+          clearWrap(item);
+          item.style.visibility = 'visible';
+          item.style.transition = DEFAULT_TRANSITION;
+          item.style.transform = 'translate(' + pos.x + 'px,' + pos.y + 'px) scale(' + scale + ')';
+          item.style.opacity = String(opacity);
+          item.style.zIndex = isActive ? '5' : '1';
+        }
+      });
+    }
+
+    function setActive(i) {
+      if (i === activeIndex) return;
+      activeIndex = i;
+      var skill = skills[i];
+      panelTitle.textContent = skill.label;
+      panelText.textContent = skill.text;
+      panelTools.innerHTML = '';
+      skill.tools.forEach(function (t) { panelTools.appendChild(buildToolItem(t)); });
+    }
+
+    function updateActiveFromOffset() {
+      setActive(((ACTIVE_SLOT + offset) % N + N) % N);
+    }
+
+    function shiftBy(steps) {
+      var prevOffset = offset;
+      offset = ((offset + steps) % N + N) % N;
+      applyLayout(prevOffset);
+      updateActiveFromOffset();
+    }
+
+    var THRESHOLD = 70;
+    var dragging = false, captured = false, pointerId = null, lastY = 0, accumulated = 0, totalMoved = 0;
+
+    field.addEventListener('pointerdown', function (e) {
+      dragging = true;
+      captured = false;
+      pointerId = e.pointerId;
+      lastY = e.clientY;
+      accumulated = 0;
+      totalMoved = 0;
+    });
+
+    field.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      var dy = e.clientY - lastY;
+      lastY = e.clientY;
+      totalMoved += Math.abs(dy);
+      if (!captured && totalMoved > 6) {
+        captured = true;
+        field.setPointerCapture(pointerId);
+        field.classList.add('is-dragging');
+      }
+      if (captured) e.preventDefault();
+      accumulated += Math.abs(dy);
+      while (accumulated >= THRESHOLD) {
+        shiftBy(1);
+        accumulated -= THRESHOLD;
+      }
+    });
+
+    function endDrag() {
+      if (!dragging) return;
+      dragging = false;
+      if (captured) {
+        try { field.releasePointerCapture(pointerId); } catch (err) {}
+        field.classList.remove('is-dragging');
+      }
+    }
+
+    field.addEventListener('pointerup', endDrag);
+    field.addEventListener('pointercancel', endDrag);
+    window.addEventListener('resize', function () {
+      computeSlots();
+      applyLayout();
+    });
+
+    computeSlots();
+    applyLayout();
+    updateActiveFromOffset();
+  })();
+</script>
+<script src="tv-noise.js"></script>
+</body>
+</html>
