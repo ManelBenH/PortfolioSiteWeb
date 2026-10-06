@@ -13,7 +13,7 @@
 <style>
   /* ---------- Design tokens ---------- */
   :root {
-    --sidebar-w: 64px;
+    --sidebar-w: 74px;
     --bg: #ffffff;
     --bg-raised: #F5F5F1;
     --ink: #1B1D1B;
@@ -165,6 +165,35 @@
 
   /* ---------- About ---------- */
   .about-text { max-width: 62ch; font-size: 1.15rem; color: var(--ink-soft); }
+
+  /* Portrait animé (hero) */
+  .portrait-regard { --portrait-w: min(620px, 44vw); perspective: 1100px; display: flex; justify-content: center; flex: 0 1 var(--portrait-w); min-width: 0; }
+  .portrait-regard__head {
+    width: min(100%, var(--portrait-w));
+    aspect-ratio: 800 / 880;
+    position: relative;
+    transform-origin: 51% 78%;
+    will-change: transform;
+  }
+  .portrait-regard__img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 18px 24px rgba(0,0,0,0.18)); }
+  .portrait-regard__eye { position: absolute; inset: 0; pointer-events: none; }
+  .portrait-regard__eye > div { position: absolute; inset: 0; background-size: 100% 100%; will-change: transform; }
+  .portrait-regard__eye--left {
+    -webkit-mask-image: radial-gradient(ellipse 5.6% 2.6% at 41.6% 36.6%, #000 45%, transparent 100%);
+    mask-image: radial-gradient(ellipse 5.6% 2.6% at 41.6% 36.6%, #000 45%, transparent 100%);
+  }
+  .portrait-regard__eye--right {
+    -webkit-mask-image: radial-gradient(ellipse 5.6% 2.6% at 61.3% 36.6%, #000 45%, transparent 100%);
+    mask-image: radial-gradient(ellipse 5.6% 2.6% at 61.3% 36.6%, #000 45%, transparent 100%);
+  }
+  .about-wrap { display: flex; flex-direction: column; gap: 48px; align-items: center; }
+  @media (min-width: 820px) {
+    .about-wrap { flex-direction: row; align-items: center; justify-content: space-between; gap: 4vw; }
+  }
+  @media (max-width: 819px) {
+    .portrait-regard { flex: 0 0 auto; width: 100%; }
+    .portrait-regard__head { width: min(100%, 360px); }
+  }
 
   .nav-link-arrow {
     display: inline-flex;
@@ -350,7 +379,16 @@
         <span class="section-num">01 — À propos</span>
       </div>
       <h1 class="section-title">Passionnée de design depuis près de dix ans</h1>
+      <div class="about-wrap">
       <p class="about-text">Tout a commencé avec un diplôme en design obtenu en 2016. Depuis, je n’ai jamais vraiment arrêté de créer, d’animer et de recommencer. Un logo qui prend vie, une charte qui tient debout, une animation qui donne le rythme juste : c'est ce langage-là que je parle le mieux. J’ajoute aujourd’hui une nouvelle corde à mon arc, le code, en particulier le HTML, le CSS et le JavaScript, pour élargir ma vision et rester polyvalente. Je suis actuellement à la recherche d’un emploi en développement Web et en création de contenu numérique, où je pourrai mettre à profit ma créativité et mes compétences techniques.</p>
+      <div class="portrait-regard" id="portraitRegard">
+        <div class="portrait-regard__head">
+          <img class="portrait-regard__img" src="images/personnage-regard.webp" alt="Portrait illustré en 3D de Manel, souriante, les cheveux bouclés" width="800" height="880" draggable="false">
+          <div class="portrait-regard__eye portrait-regard__eye--left"><div></div></div>
+          <div class="portrait-regard__eye portrait-regard__eye--right"><div></div></div>
+        </div>
+      </div>
+      </div>
     </section>
 
     <section id="competences">
@@ -690,5 +728,6 @@
   })();
 </script>
 <script src="tv-noise.js"></script>
+<script src="portrait-regard.js" defer></script>
 </body>
 </html>

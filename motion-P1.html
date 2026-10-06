@@ -18,7 +18,8 @@
     --green:#6FA84B;
     --red:#E4483A;
     --line:#D9D7D2;
-    --max:1180px;
+    --max:1500px;
+    --pad-x:max(var(--gutter), calc((100% - var(--max)) / 2));
     --gutter:clamp(24px, 5vw, 72px);
   }
 
@@ -59,7 +60,7 @@
      conflit avec les variables de cette page.
   --------------------------------------------- */
   :root{
-    --sidebar-w:64px;
+    --sidebar-w:74px;
     --sb-bg:#ffffff;
     --sb-ink:#1B1D1B;
     --sb-ink-soft:#55584f;
@@ -167,7 +168,7 @@
     display:flex;
     flex-direction:column;
     justify-content:flex-end;
-    padding:0 var(--gutter) 64px;
+    padding:72px var(--pad-x) 64px;
   }
   .hero__illustration{
     position:absolute;
@@ -188,7 +189,7 @@
     font-size:clamp(2.4rem, 6vw, 4.6rem);
     font-weight:600;
     line-height:1.04;
-    max-width:14ch;
+    max-width:none;
     letter-spacing:-0.01em;
   }
   .hero__meta{
@@ -213,7 +214,7 @@
   }
   .hero__logo{
     position:absolute;
-    bottom:40px; left:var(--gutter);
+    bottom:40px; left:var(--pad-x);
     font-family:'Sora', sans-serif;
     font-size:13px;
     color:#C9B6E8;
@@ -221,7 +222,7 @@
 
   /* ---------------- MODULE ---------------- */
   .motion-module{
-    padding:96px var(--gutter) 40px;
+    padding:96px var(--pad-x) 40px;
     border-bottom:1px solid var(--line);
   }
   .motion-module:last-of-type{border-bottom:none;}
@@ -403,11 +404,16 @@
 
   /* ---------------- FOOTER (placeholder) ---------------- */
   .project-footer{
-    padding:64px var(--gutter) 96px;
+    padding:64px var(--pad-x) 96px;
     text-align:center;
     font-size:14px;
     color:var(--ink-soft);
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:16px 40px;
   }
+  .project-footer a:nth-child(2){margin-left:auto}
   .project-footer a{
     color:var(--purple);
     text-decoration:none;
@@ -584,7 +590,9 @@
 </section>
 
 <footer class="project-footer">
-  <a href="graphique.html">Voir les projets graphiques →</a>
+  <a href="index.html">← Retour</a>
+  <a href="projets/motion-02.html">Projet Med →</a>
+  <a href="projets/motion-03.html">Projet Association →</a>
 </footer>
 
 </div>
