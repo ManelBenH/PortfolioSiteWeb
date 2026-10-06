@@ -155,8 +155,7 @@
   .page { margin-left: var(--sidebar-w); }
   section { padding: 96px 6vw; }
   .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; margin-bottom: 48px; flex-wrap: wrap; }
-  .section-num { font-family: var(--font-display); font-size: 0.85rem; color: var(--ink-soft); }
-  .section-title { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 600; }
+  .section-title { font-family: 'Inter'; font-style: normal; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 600; }
 
   /* ---------- Hero ---------- */
   .hero {
@@ -203,7 +202,9 @@
   }
 
   /* ---------- About ---------- */
-  .about-text { max-width: 62ch; font-size: 1.15rem; color: var(--ink-soft); }
+  #apropos { min-height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+  .about-block { width: fit-content; max-width: 100%; }
+  .about-text { width: 0; min-width: 100%; margin: 0; font-size: 1.35rem; color: var(--ink-soft); }
   .about-more {
     display: inline-flex;
     align-items: center;
@@ -222,19 +223,33 @@
   .about-more:hover .arrow, .about-more:focus-visible .arrow { transform: translateX(6px); }
 
   /* ---------- Travaux ---------- */
-  .work-group { margin-bottom: 72px; }
+  .work-group { margin-bottom: 150px; }
   .work-group:last-child { margin-bottom: 0; }
   /* Titre de groupe au-dessus des cartes : grand titre en gras, sous-titre en petit juste en dessous */
-  .work-group-head { margin-bottom: 28px; }
+  .work-group-head { margin-bottom: 56px; }
   .work-group-title,
   .work-group-title a {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 6px 24px;
+    width: 100%;
   }
-  .work-group-name { font-size: 2.6rem; font-weight: 700; line-height: 0.9; }
-  .work-group-sub { font-size: 0.8rem; font-weight: 500; }
+  .work-group-name {
+    font-family: 'Inter', var(--font-display);
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+  }
+  .work-group-sub {
+    font-family: 'Inter', var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 400;
+    letter-spacing: -0.045em;
+    text-align: right;
+  }
   .work-group-title a { color: inherit; text-decoration: none; transition: color 0.2s ease; }
   .work-group-title a:hover, .work-group-title a:focus-visible { color: var(--accent); }
 
@@ -263,7 +278,7 @@
   /* ---------- Accordion (groupe A) ---------- */
 .accordion {
   display: flex;
-  height: min(56vh, 460px);
+  height: min(62vh, 540px);
   min-height: 320px;
   gap: 0;
 }
@@ -466,11 +481,10 @@
     </section>
 
     <section id="apropos">
-      <div class="section-head">
-        <span class="section-num">01 — À propos</span>
-      </div>
-      <h2 class="section-title" style="margin-bottom: 28px;">Passionnée de design depuis près de dix ans</h2>
+      <div class="about-block">
+      <h2 class="section-title" style="margin-bottom: 28px; text-transform: uppercase;">Passionnée de design depuis près de dix ans</h2>
       <p class="about-text">Tout a commencé avec un diplôme en design obtenu en 2016. Depuis, je n’ai jamais vraiment arrêté de créer, d’animer et de recommencer. Un logo qui prend vie, une charte qui tient debout, une animation qui donne le rythme juste : c'est ce langage-là que je parle le mieux. J’ajoute aujourd’hui une nouvelle corde à mon arc, le code, en particulier le HTML, le CSS et le JavaScript, pour élargir ma vision et rester polyvalente. Je suis actuellement à la recherche d’un emploi en développement Web et en création de contenu numérique, où je pourrai mettre à profit ma créativité et mes compétences techniques.</p>
+      </div>
       <a class="about-more" href="apropos.html">
         <span>Plus d'informations</span>
         <span class="arrow" aria-hidden="true">→</span>
@@ -478,9 +492,6 @@
     </section>
 
     <section id="travaux">
-      <div class="section-head">
-        <span class="section-num">02 — Travaux</span>
-      </div>
 
       <div class="work-group">
   <div class="work-group-head">
@@ -648,9 +659,6 @@
     </section>
 
     <section id="contact">
-      <div class="section-head">
-        <span class="section-num">03 — Contact</span>
-      </div>
       <div class="contact-grid">
         <p class="contact-text">Un projet en tête, une collaboration à discuter ou simplement envie d'échanger ? Écrivez-moi.</p>
         <div class="contact-links">

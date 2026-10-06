@@ -312,7 +312,7 @@
       overflow: hidden;
       isolation: isolate;
       padding:
-        var(--page-top)
+        clamp(28px, 4vw, 48px)
         var(--gap)
         clamp(28px, 4vw, 48px);
     }
@@ -343,6 +343,29 @@
       .page-head::before { animation: none; }
     }
 
+    .page-head .back-link {
+      position: absolute;
+      top: clamp(28px, 4vw, 48px);
+      right: var(--gap);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--ink);
+      text-decoration: none;
+      padding-bottom: 4px;
+      border-bottom: 1px solid currentColor;
+      transition: color .2s ease;
+    }
+
+    .page-head .back-link .arrow { transition: transform .2s ease; }
+    .page-head .back-link:hover,
+    .page-head .back-link:focus-visible { color: var(--accent); }
+    .page-head .back-link:hover .arrow,
+    .page-head .back-link:focus-visible .arrow { transform: translateX(-6px); }
+
     .page-head h1 {
       font-size: clamp(32px, 5vw, 56px);
       font-weight: 700;
@@ -352,7 +375,8 @@
 
     .page-head p {
       margin: 14px 0 0;
-      max-width: 46ch;
+      max-width: none;
+      white-space: nowrap;
 
       font-size: 16px;
       line-height: 1.6;
@@ -410,6 +434,11 @@
       cursor: pointer;
     }
 
+    .index-row:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+
     .index-row:last-child {
       border-bottom: 1px solid var(--line);
     }
@@ -436,12 +465,23 @@
       transition: color 0.35s ease;
     }
 
-    .index-row.is-active .index-title,
     .index-row.is-active .index-year {
       color: var(--ink);
     }
 
+    /* Couleur du titre quand le projet est actif — une par projet (à modifier ici) */
+    .index-row[data-index="0"] { --project-color: #3E6B60; } /* Pure Wine Carthage */
+    .index-row[data-index="1"] { --project-color: #25402E; } /* Pavillon Lounge */
+    .index-row[data-index="2"] { --project-color: #0D4584; } /* Jardins intérieurs */
+    .index-row[data-index="3"] { --project-color: #1C93BA; } /* XVIII Sommet de la Francophonie */
+    .index-row[data-index="4"] { --project-color: #DE4851; } /* La semaine de la cuisine italienne */
+    .index-row[data-index="5"] { --project-color: #2B3A4A; } /* Rapport institutionnel */
+    .index-row[data-index="6"] { --project-color: #2F4AA0; } /* Création de supports print */
+    .index-row[data-index="7"] { --project-color: #000000; } /* Dossier de sponsoring */
+    .index-row[data-index="8"] { --project-color: #3F7F96; } /* Catalogue */
+
     .index-row.is-active .index-title {
+      color: var(--project-color, #3B2FE0);
       font-weight: 700;
     }
 
@@ -616,6 +656,10 @@
           40px
           clamp(24px, 6vw, 40px)
           32px;
+      }
+
+      .page-head p {
+        white-space: normal;
       }
 
       .work {
@@ -812,6 +856,11 @@
 
     <header class="page-head">
 
+      <a class="back-link" href="index.html#travaux">
+        <span class="arrow" aria-hidden="true">←</span>
+        <span>Retour</span>
+      </a>
+
       <h1>Graphique</h1>
 
       <p>
@@ -879,10 +928,6 @@
             </p>
           </div>
 
-          <a class="index-link" href="#" target="_blank" rel="noopener">
-            Voir le projet →
-          </a>
-
           <img
             class="mobile-image"
             src="images/Pavillon-Photo1.webp"
@@ -913,10 +958,6 @@
               d'un catalogue et de panneaux d'exposition.
             </p>
           </div>
-
-          <a class="index-link" href="#" target="_blank" rel="noopener">
-            Voir le projet →
-          </a>
 
           <img
             class="mobile-image"
@@ -959,10 +1000,6 @@
             </p>
           </div>
 
-          <a class="index-link" href="#" target="_blank" rel="noopener">
-            Voir le projet →
-          </a>
-
           <img
             class="mobile-image"
             src="images/djerba-Photo1.webp"
@@ -995,10 +1032,6 @@
               tout en leur définissant à chacun une identité propre.
             </p>
           </div>
-
-          <a class="index-link" href="#" target="_blank" rel="noopener">
-            Voir le projet →
-          </a>
 
           <img
             class="mobile-image"
@@ -1034,10 +1067,6 @@
             </p>
           </div>
 
-          <a class="index-link" href="#" target="_blank" rel="noopener">
-            Voir le projet →
-          </a>
-
           <img
             class="mobile-image"
             src="images/Maak-Photo1.webp"
@@ -1070,10 +1099,6 @@
             </p>
           </div>
 
-          <a class="index-link" href="#" target="_blank" rel="noopener">
-            Voir le projet →
-          </a>
-
           <img
             class="mobile-image"
             src="images/med-Photo1.webp"
@@ -1100,10 +1125,6 @@
               ainsi que des illustrations et de la couverture.
             </p>
           </div>
-
-          <a class="index-link" href="#" target="_blank" rel="noopener">
-            Voir le projet →
-          </a>
 
           <img
             class="mobile-image"
@@ -2041,7 +2062,7 @@
       function setHeaderHeight() {
         const h = header.offsetHeight;
         document.documentElement.style.setProperty("--page-head-h", h + "px");
-        document.documentElement.style.setProperty("--sticky-top", (h + 24) + "px");
+        document.documentElement.style.setProperty("--sticky-top", h + "px");
       }
 
       setHeaderHeight();

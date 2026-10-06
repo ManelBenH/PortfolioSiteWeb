@@ -152,7 +152,33 @@
     top: 0;
     z-index: 40;
     background: var(--bg);
+    overflow: hidden;
+    isolation: isolate;
     padding: clamp(40px, 8vw, 90px) var(--gap) clamp(20px, 4vw, 40px);
+  }
+
+  .page-head::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -500px;
+    left: calc(-500px - var(--sidebar-w));
+    width: calc(100vw + 1000px);
+    height: calc(100vh + 1000px);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2' intercept='-.5'/%3E%3CfeFuncG type='linear' slope='2' intercept='-.5'/%3E%3CfeFuncB type='linear' slope='2' intercept='-.5'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 320px 320px;
+    opacity: 0;
+    animation: tv-noise 3s steps(8, end) infinite both;
+    transition: opacity .6s ease;
+    pointer-events: none;
+  }
+
+  .tv-noise-wrapper.is-visible ~ .page .page-head::before {
+    opacity: 0.5;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-head::before { animation: none; }
   }
 
   @media (max-width: 860px) {
