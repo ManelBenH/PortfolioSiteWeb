@@ -390,28 +390,14 @@
   /* ---------- Contact ---------- */
   #contact { min-height: 80dvh; display: flex; flex-direction: column; justify-content: center; }
   .contact-grid { display: flex; flex-wrap: wrap; gap: 48px; justify-content: space-between; }
-  .contact-text { max-width: 46ch; color: var(--ink-soft); font-size: 1.05rem; }
+  .contact-text { max-width: 46ch; font-family: 'Inter'; font-style: normal; font-size: clamp(1.3rem, 2.3vw, 1.9rem); font-weight: 600; }
   .contact-links { display: flex; flex-direction: column; gap: 14px; font-family: var(--font-display); font-size: 1.15rem; }
+  .contact-links-row { display: flex; justify-content: space-between; gap: 28px; flex-wrap: wrap; }
   .contact-links a { text-decoration: none; padding-bottom: 4px; width: fit-content; }
   .contact-links a:hover, .contact-links a:focus-visible { border-color: var(--accent); color: var(--accent); }
-  .btn-cv {
-    margin-top: 8px;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 22px;
-    border: 1px solid var(--ink);
-    background: none;
-    text-decoration: none;
-    font-family: var(--font-display);
-    font-weight: 600;
-    width: fit-content;
-    transition: background 0.2s ease, color 0.2s ease;
-  }
-  .btn-cv:hover, .btn-cv:focus-visible { background: var(--ink); color: var(--bg); }
 
   /* ---------- Footer ---------- */
-  .site-footer { background: var(--bg-raised); min-height: 80dvh; display: flex; flex-direction: column; justify-content: space-between; padding: 72px 6vw 40px; border-bottom: none; }
+  .site-footer { background: var(--bg-raised); display: flex; flex-direction: column; justify-content: space-between; padding: 72px 6vw 40px; border-bottom: none; }
   .footer-top { display: flex; justify-content: flex-end; }
   .footer-cols { display: flex; gap: 56px; flex-wrap: wrap; }
   .footer-col { display: flex; flex-direction: column; gap: 10px; }
@@ -420,11 +406,13 @@
   .footer-col a:hover, .footer-col a:focus-visible { color: var(--accent); }
   .footer-credit { font-size: 0.8rem; color: var(--ink-soft); text-align: right; margin-top: 28px; }
   .footer-giant {
-    font-family: 'Hachi Maru Pop', var(--font-display);
-    font-weight: 400;
+    font-family: 'Inter', var(--font-display);
+    font-weight: 900;
     font-size: clamp(2.2rem, 10vw, 7.5rem);
     line-height: 0.9;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+    color: var(--accent);
     margin-top: 0;
     margin-bottom: clamp(24px, 6vw, 80px);
     white-space: nowrap;
@@ -663,9 +651,10 @@
         <p class="contact-text">Un projet en tête, une collaboration à discuter ou simplement envie d'échanger ? Écrivez-moi.</p>
         <div class="contact-links">
           <a href="mailto:mmanelbenhalima@gmail.com">mmanelbenhalima@gmail.com</a>
-          <a href="https://www.linkedin.com/in/manel-ben-halima" target="_blank" rel="noopener">LinkedIn</a>
-          <a href="https://www.behance.net/mmanelben" target="_blank" rel="noopener">Behance</a>
-          <a class="btn-cv" href="cv.pdf" download>Télécharger mon CV</a>
+          <div class="contact-links-row">
+            <a href="https://www.linkedin.com/in/manel-ben-halima" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="https://www.behance.net/mmanelben" target="_blank" rel="noopener">Behance</a>
+          </div>
         </div>
       </div>
     </section>
@@ -694,7 +683,7 @@
         </div>
         <div class="footer-credit">Conçu &amp; développé par Manel Ben Halima — © 2026</div>
       </div>
-      <div class="footer-giant">THANKYOU</div>
+      <div class="footer-giant">MERCI</div>
     </footer>
 
   </main>

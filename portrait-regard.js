@@ -6,7 +6,7 @@
   const eyeL = root.querySelector('.portrait-regard__eye--left > div');
   const eyeR = root.querySelector('.portrait-regard__eye--right > div');
 
-  const TILT = 0.9;   // inclinaison de la tête (réglage validé)
+  const TILT = 0.6;   // inclinaison de la tête
   const EYES = 2;     // décalage des yeux (réglage validé)
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const tiltK = reduce ? 0 : TILT;

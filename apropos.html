@@ -14,6 +14,8 @@
   /* ---------- Design tokens ---------- */
   :root {
     --sidebar-w: 74px;
+    --content-max: 1480px;
+    --gutter: max(0px, calc((20vw - var(--sidebar-w)) / 2));
     --bg: #ffffff;
     --bg-raised: #F5F5F1;
     --ink: #1B1D1B;
@@ -147,7 +149,7 @@
     line-height: 1.05;
     transition: opacity 0.2s ease;
   }
-  .menu-link .idx { font-size: clamp(0.85rem, 1.6vw, 1.1rem); font-weight: 500; opacity: 0.7; }
+  .menu-link .idx { font-size: clamp(0.85rem, 1.10vw, 1.1rem); font-weight: 500; opacity: 0.7; }
   .menu-link:hover, .menu-link:focus-visible, .menu-link.is-active { opacity: 1; }
 
   .menu-bottom { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; font-size: 0.85rem; }
@@ -158,19 +160,46 @@
 
   /* ---------- Layout ---------- */
   .page { margin-left: var(--sidebar-w); }
-  section { padding: 96px 6vw; }
+  section { padding: 150px var(--gutter); }
   .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; margin-bottom: 48px; flex-wrap: wrap; }
-  .section-num { font-family: var(--font-display); font-size: 0.85rem; color: var(--ink-soft); }
-  .section-title { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 600; margin-bottom: 28px; }
+  .section-title { font-size: clamp(1.3rem, 2.3vw, 1.9rem); font-weight: 600; margin-bottom: 28px; }
 
   /* ---------- About ---------- */
-  .about-text { max-width: 62ch; font-size: 1.15rem; color: var(--ink-soft); }
+  #apropos { position: relative; }
+  .scroll-arrow {
+    position: absolute;
+    right: max(24px, var(--gutter));
+    bottom: 32px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    text-decoration: none;
+    animation: arrow-bob 1.8s ease-in-out infinite;
+    transition: color 200ms ease;
+  }
+  .scroll-arrow:hover, .scroll-arrow:focus-visible { color: var(--accent); }
+  .scroll-arrow svg { width: 32px; height: 32px; }
+  @keyframes arrow-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+  .nav-link-arrow.back-link {
+    position: absolute;
+    top: 32px;
+    right: max(24px, var(--gutter));
+    margin-top: 0;
+    border-bottom: 1px solid var(--ink);
+  }
+  #apropos { padding-top: 0; padding-bottom: 0; min-height: 90dvh; display: flex; flex-direction: column; justify-content: center; }
+  .about-copy { min-width: 0; }
+  .about-copy .section-title { margin: 0 0 28px; }
+  .about-text { max-width: 74ch; font-size: 1.5rem; color: var(--ink-soft); }
 
   /* Portrait animé (hero) */
-  .portrait-regard { --portrait-w: min(620px, 44vw); perspective: 1100px; display: flex; justify-content: center; flex: 0 1 var(--portrait-w); min-width: 0; }
+  .portrait-regard { --portrait-w: min(860px, 44vw); perspective: 1100px; display: flex; justify-content: center; flex: 0 1 var(--portrait-w); min-width: 0; }
   .portrait-regard__head {
     width: min(100%, var(--portrait-w));
-    aspect-ratio: 800 / 880;
+    aspect-ratio: 1122 / 1402;
     position: relative;
     transform-origin: 51% 78%;
     will-change: transform;
@@ -179,13 +208,14 @@
   .portrait-regard__eye { position: absolute; inset: 0; pointer-events: none; }
   .portrait-regard__eye > div { position: absolute; inset: 0; background-size: 100% 100%; will-change: transform; }
   .portrait-regard__eye--left {
-    -webkit-mask-image: radial-gradient(ellipse 5.6% 2.6% at 41.6% 36.6%, #000 45%, transparent 100%);
-    mask-image: radial-gradient(ellipse 5.6% 2.6% at 41.6% 36.6%, #000 45%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 5.6% 2.6% at 36.1% 31.9%, #000 45%, transparent 100%);
+    mask-image: radial-gradient(ellipse 5.6% 2.6% at 36.1% 31.9%, #000 45%, transparent 100%);
   }
   .portrait-regard__eye--right {
-    -webkit-mask-image: radial-gradient(ellipse 5.6% 2.6% at 61.3% 36.6%, #000 45%, transparent 100%);
-    mask-image: radial-gradient(ellipse 5.6% 2.6% at 61.3% 36.6%, #000 45%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 5.6% 2.6% at 53.3% 29.8%, #000 45%, transparent 100%);
+    mask-image: radial-gradient(ellipse 5.6% 2.6% at 53.3% 29.8%, #000 45%, transparent 100%);
   }
+  #apropos > .about-wrap { width: 100%; max-width: var(--content-max); margin-inline: auto; }
   .about-wrap { display: flex; flex-direction: column; gap: 48px; align-items: center; }
   @media (min-width: 820px) {
     .about-wrap { flex-direction: row; align-items: center; justify-content: space-between; gap: 4vw; }
@@ -219,7 +249,9 @@
     flex-direction: column;
     justify-content: center;
   }
-  .skills-intro { max-width: 46ch; color: var(--ink-soft); font-size: 1.05rem; margin-bottom: 56px; }
+  #competences > .wheel-wrap { width: 100%; max-width: var(--content-max); margin-inline: auto; }
+  #competences > .section-title { margin-left: max(0px, calc((100% - var(--content-max)) / 2)); margin-bottom: 16px; }
+  .skills-intro { max-width: none; white-space: nowrap; margin-left: max(0px, calc((100% - var(--content-max)) / 2)); color: var(--ink-soft); font-size: 1.35rem; margin-bottom: 56px; }
 
   .wheel-wrap { display: flex; align-items: center; justify-content: space-between; gap: 48px; flex-wrap: wrap; }
   .wheel-field {
@@ -269,15 +301,13 @@
 
   .skill-panel {
     flex: 1 1 320px;
-    max-width: 420px;
+    max-width: 760px;
     min-height: 220px;
-    background: var(--bg-raised);
-    border: 1px solid var(--line);
-    padding: 24px;
+    padding: 0;
   }
-  .skill-panel h3 { font-size: 1.2rem; margin-bottom: 10px; }
-  .skill-panel p { font-size: 0.92rem; color: var(--ink-soft); margin-bottom: 16px; }
-  .tool-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; }
+  .skill-panel h3 { font-size: 1.4rem; margin-bottom: 10px; }
+  .skill-panel p { font-size: 1.35rem; color: var(--ink-soft); margin-bottom: 16px; }
+  .tool-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: row; flex-wrap: wrap; gap: 12px 28px; font-size: 1rem; }
   .tool-list li { display: flex; align-items: center; gap: 10px; }
   .tool-badge {
     display: inline-flex;
@@ -292,20 +322,27 @@
     font-weight: 700;
     border-radius: 40% 60% 55% 45% / 45% 40% 60% 55%;
   }
+  .tool-badge.is-adobe { border-radius: 6px; border: 2px solid currentColor; letter-spacing: -0.02em; font-size: 0.7rem; }
+  .tool-badge.is-brand {
+    border-radius: 0;
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+  }
 
   .skills-cards { display: none; }
 
   @media (max-width: 760px) {
     .wheel-wrap { display: none; }
+    .skills-intro { white-space: normal; }
     .skills-cards {
       display: flex;
       gap: 16px;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
       padding-bottom: 8px;
-      margin: 0 -6vw;
-      padding-left: 6vw;
-      padding-right: 6vw;
+      margin: 0 calc(-1 * var(--gutter));
+      padding-left: var(--gutter);
+      padding-right: var(--gutter);
       -webkit-overflow-scrolling: touch;
     }
     .skill-card {
@@ -330,10 +367,10 @@
     .skill-card p { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 14px; }
   }
 
-  .apropos-footer { border-bottom: none; }
+  #competences > .skills-back { margin-top: 48px; margin-left: max(0px, calc((100% - var(--content-max)) / 2)); }
 
   @media (max-width: 640px) {
-    section { padding: 64px 6vw; }
+    section { padding: 64px var(--gutter); }
   }
 </style>
 <link rel="stylesheet" href="tv-noise.css">
@@ -375,26 +412,25 @@
   <main class="page" id="main">
 
     <section id="apropos">
-      <div class="section-head">
-        <span class="section-num">01 — À propos</span>
-      </div>
-      <h1 class="section-title">Passionnée de design depuis près de dix ans</h1>
       <div class="about-wrap">
+      <div class="about-copy">
+      <h1 class="section-title">Passionnée de design depuis près de dix ans</h1>
       <p class="about-text">Tout a commencé avec un diplôme en design obtenu en 2016. Depuis, je n’ai jamais vraiment arrêté de créer, d’animer et de recommencer. Un logo qui prend vie, une charte qui tient debout, une animation qui donne le rythme juste : c'est ce langage-là que je parle le mieux. J’ajoute aujourd’hui une nouvelle corde à mon arc, le code, en particulier le HTML, le CSS et le JavaScript, pour élargir ma vision et rester polyvalente. Je suis actuellement à la recherche d’un emploi en développement Web et en création de contenu numérique, où je pourrai mettre à profit ma créativité et mes compétences techniques.</p>
+      </div>
       <div class="portrait-regard" id="portraitRegard">
         <div class="portrait-regard__head">
-          <img class="portrait-regard__img" src="images/personnage-regard.webp" alt="Portrait illustré en 3D de Manel, souriante, les cheveux bouclés" width="800" height="880" draggable="false">
+          <img class="portrait-regard__img" src="images/personnage-regard1.png" alt="Portrait illustré en 3D de Manel, souriante, les cheveux bouclés" width="1122" height="1402" draggable="false">
           <div class="portrait-regard__eye portrait-regard__eye--left"><div></div></div>
           <div class="portrait-regard__eye portrait-regard__eye--right"><div></div></div>
         </div>
       </div>
       </div>
+      <a class="nav-link-arrow back-link" href="index.html"><span class="arrow" aria-hidden="true">←</span><span>Retour</span></a>
+      <a href="#competences" class="scroll-arrow" aria-label="Aller à la section Compétences"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v16M5 13l7 7 7-7"/></svg></a>
     </section>
 
     <section id="competences">
-      <div class="section-head">
-        <span class="section-num">02 — Compétences</span>
-      </div>
+      <h2 class="section-title">Compétences</h2>
       <p class="skills-intro">Cinq univers, une seule curiosité — faites glisser la roue ou touchez un point.</p>
 
       <div class="wheel-wrap">
@@ -411,14 +447,12 @@
       </div>
 
       <div class="skills-cards" id="skillsCards"></div>
-    </section>
 
-    <footer class="apropos-footer">
-      <a class="nav-link-arrow" href="index.html">
+      <a class="nav-link-arrow skills-back" href="index.html">
         <span class="arrow" aria-hidden="true">←</span>
         <span>Retour à l'accueil</span>
       </a>
-    </footer>
+    </section>
 
   </main>
 
@@ -479,7 +513,7 @@
     var skills = [
       {
         id: 'photo', emoji: '📷', label: 'Photo', color: 'var(--skill-1)',
-        text: "Sélection, retouche et mise en valeur d'images, de la prise de vue à la livraison.",
+        text: "Je capture des images qui mettent en valeur une personne, un produit ou un univers, en travaillant la lumière, la composition et l’atmosphère.  Je cherche à raconter une histoire à travers chaque prise de vue, en créant des images à la fois esthétiques, naturelles et cohérentes avec l’identité du projet. Du cadrage à la retouche, je construis une direction visuelle adaptée aux besoins du projet, qu’il s’agisse de portraits, de produits, de contenu éditorial ou de communication.",
         tools: [
           { mono: 'Lr', color: '#2FB4C9', name: 'Lightroom' },
           { mono: 'Ps', color: '#33C7F4', name: 'Photoshop (retouche)' }
@@ -487,7 +521,7 @@
       },
       {
         id: 'design', emoji: '🎨', label: 'Design graphique', color: 'var(--skill-2)',
-        text: 'Identités visuelles, chartes graphiques et mise en page, du logo au support imprimé.',
+        text: 'Je conçois des identités visuelles cohérentes et mémorables, de la recherche conceptuelle jusqu’à leur déclinaison sur différents supports. Je travaille la composition, la typographie, la couleur et la hiérarchie visuelle afin de construire des univers graphiques qui transmettent clairement l’identité d’une marque.  Je transforme une idée ou un besoin en solutions visuelles adaptées au print comme au numérique, tout en veillant à maintenir une direction artistique forte et cohérente.',
         tools: [
           { mono: 'Ps', color: '#33C7F4', name: 'Photoshop' },
           { mono: 'Ai', color: '#FF8A34', name: 'Illustrator' },
@@ -496,7 +530,7 @@
       },
       {
         id: 'motion', emoji: '🎬', label: 'Motion design', color: 'var(--skill-3)',
-        text: 'Animations 2D et vidéos promotionnelles qui donnent du rythme à une marque.',
+        text: 'Je donne vie aux idées à travers des animations 2D, des transitions et des compositions en mouvement pensées pour capter l’attention et renforcer un message. Je travaille le rythme, le mouvement, la typographie et le sound design pour créer des contenus dynamiques et cohérents avec l’identité visuelle d’une marque. De la conception du storyboard à l’animation finale, je transforme une direction artistique en expériences visuelles adaptées aux réseaux sociaux, aux campagnes et aux contenus numériques.',
         tools: [
           { mono: 'Ae', color: '#B15FFF', name: 'After Effects' },
           { mono: 'Pr', color: '#6E6FFF', name: 'Adobe Premiere Pro' }
@@ -504,7 +538,7 @@
       },
       {
         id: 'dev', emoji: '💻', label: 'Dev', color: 'var(--skill-4)',
-        text: 'Des bases solides pour prototyper mes idées et dialoguer avec les équipes techniques.',
+        text: 'Je conçois et développe des interfaces web modernes, intuitives et responsives, en transformant une maquette graphique en expérience interactive. Je travaille la structure, l’intégration et les interactions avec HTML, CSS et JavaScript, tout en accordant une attention particulière aux détails, aux animations et à l’expérience utilisateur. J’aime créer des sites qui combinent esthétique et fonctionnalité, avec un code propre, adaptable et pensé pour offrir une expérience fluide sur tous les écrans.',
         tools: [
           { mono: 'H', color: '#E44D26', name: 'HTML' },
           { mono: 'C', color: '#2965F1', name: 'CSS' },
@@ -515,13 +549,23 @@
       },
       {
         id: 'ia', emoji: '🤖', label: 'IA', color: 'var(--skill-5)',
-        text: "Des outils d'IA intégrés à mon flux de travail pour aller plus vite, sans perdre en exigence.",
+        text: "J’intègre l’intelligence artificielle dans mes processus créatifs et techniques pour explorer de nouvelles idées, accélérer la production et enrichir mes projets.  J’utilise différents outils d’IA pour générer, transformer et expérimenter avec des images, du contenu, du code et des concepts visuels, tout en gardant une direction créative humaine.  Je considère l’IA comme un outil de collaboration qui me permet de tester plus rapidement, d’explorer davantage de possibilités et de transformer des idées complexes en solutions concrètes.",
         tools: [
           { mono: 'AI', color: '#7C5CFC', name: "Outils d'IA génératifs" },
           { mono: 'Sec', color: '#16A34A', name: 'Notions de cybersécurité' }
         ]
       }
     ];
+
+    var ADOBE = {
+      Lr: ['#001E36', '#31A8FF'], Ps: ['#001E36', '#31A8FF'],
+      Ai: ['#330000', '#FF9A00'], Id: ['#49021F', '#FF3366'],
+      Ae: ['#00005B', '#9999FF'], Pr: ['#00005B', '#9999FF']
+    };
+    var BRAND = {
+      H: ['html5', '#E34F26'], C: ['css3', '#1572B6'], JS: ['javascript', '#F7DF1E'],
+      Git: ['git', '#F05032'], Gh: ['github', '#181717']
+    };
 
     var N = skills.length;
     var ACTIVE_SLOT = 2;
@@ -562,9 +606,20 @@
       var li = document.createElement('li');
       var badge = document.createElement('span');
       badge.className = 'tool-badge';
-      badge.style.background = t.color;
-      if (t.dark) badge.style.color = '#1B1D1B';
-      badge.textContent = t.mono;
+      if (ADOBE[t.mono]) {
+        badge.classList.add('is-adobe');
+        badge.style.background = ADOBE[t.mono][0];
+        badge.style.color = ADOBE[t.mono][1];
+        badge.textContent = t.mono;
+      } else if (BRAND[t.mono]) {
+        badge.classList.add('is-brand');
+        badge.style.background = BRAND[t.mono][1];
+        badge.style.setProperty('--icon', 'url(https://cdn.jsdelivr.net/npm/simple-icons@11.14.0/icons/' + BRAND[t.mono][0] + '.svg)');
+        badge.setAttribute('role', 'img');
+      } else {
+        badge.style.background = t.color;
+        badge.textContent = t.mono;
+      }
       li.appendChild(badge);
       li.appendChild(document.createTextNode(t.name));
       return li;
