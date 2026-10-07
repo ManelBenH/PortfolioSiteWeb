@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motion design — Manel Ben Halima</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Work+Sans:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --ink:#1C1B1F;
+    --ink-soft:#615E68;
+    --purple:#5A2E8C;
+    --purple-deep:#3E1F63;
+    --yellow:#F5C242;
+    --green:#6FA84B;
+    --red:#E4483A;
+    --line:#D9D7D2;
+    --max:1500px;
+    --pad-x:max(var(--gutter), calc((100% - var(--max)) / 2));
+    --gutter:clamp(24px, 5vw, 72px);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Sora', sans-serif;
+    margin:0;
+  }
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+  body{margin-left:var(--sidebar-w);}
+
+  .skip-link{
+    position:absolute;
+    left:-999px;
+    top:0;
+    background:#3B2FE0;
+    color:#fff;
+    padding:10px 16px;
+    z-index:300;
+  }
+  .skip-link:focus{left:var(--sidebar-w);}
+
+  /* ---------------------------------------------
+     SIDEBAR + MENU — copiés depuis index.html pour
+     garder la navigation identique sur tout le site.
+     Tokens propres (--sb-*) pour ne pas entrer en
+     conflit avec les variables de cette page.
+  --------------------------------------------- */
+  :root{
+    --sidebar-w:74px;
+    --sb-bg:#ffffff;
+    --sb-ink:#1B1D1B;
+    --sb-ink-soft:#55584f;
+    --sb-line:rgba(27, 29, 27, 0.14);
+    --sb-accent:#3B2FE0;
+    --font-display:'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    --font-body:'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .sidebar{
+    position:fixed;
+    left:0; top:0; bottom:0;
+    width:var(--sidebar-w);
+    border-right:1px solid var(--sb-line);
+    background:var(--sb-bg);
+    z-index:50;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    padding:20px 0;
+  }
+  .hamburger{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    width:22px;
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:8px;
+  }
+  .hamburger span{
+    display:block;
+    height:2px;
+    width:100%;
+    background:var(--sb-ink);
+    transition:transform 0.25s ease, opacity 0.25s ease;
+  }
+  .hamburger.is-open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+  .hamburger.is-open span:nth-child(2){opacity:0;}
+  .hamburger.is-open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+
+  .vlabel, .vname, .year{
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+    white-space:nowrap;
+    font-family:var(--font-display);
+    color:var(--sb-ink);
+  }
+  .vlabel{font-size:0.7rem;letter-spacing:0.08em;color:var(--sb-ink-soft);font-family:var(--font-body);}
+  .vname{font-weight:600;font-size:0.85rem;}
+  .year{font-size:0.68rem;color:var(--sb-ink-soft);font-family:var(--font-body);}
+  .mid-stack{display:flex;flex-direction:column;align-items:center;gap:28px;text-decoration:none;}
+
+  .menu-overlay{
+    position:fixed;
+    top:0; right:0; bottom:0;
+    left:var(--sidebar-w);
+    background:var(--sb-ink);
+    color:var(--sb-bg);
+    z-index:100;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:28px 5vw;
+    transform:translateY(-100%);
+    transition:transform 0.45s cubic-bezier(.2,.7,.2,1);
+    font-family:var(--font-body);
+  }
+  .menu-overlay.is-open{transform:translateY(0);}
+  .menu-top{display:flex;justify-content:space-between;align-items:flex-start;}
+  .menu-top .brand{font-family:var(--font-display);font-size:0.85rem;opacity:0.7;}
+  .menu-close{background:none;border:none;color:inherit;font-size:0.85rem;letter-spacing:0.08em;cursor:pointer;}
+  .menu-nav{display:flex;flex-direction:column;gap:6px;}
+  .menu-link{
+    display:flex;
+    align-items:baseline;
+    gap:20px;
+    text-decoration:none;
+    opacity:0.4;
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(2rem, 8vw, 4.4rem);
+    letter-spacing:-0.01em;
+    line-height:1.05;
+    transition:opacity 0.2s ease;
+    color:var(--sb-bg);
+  }
+  .menu-link .idx{font-size:clamp(0.85rem, 1.6vw, 1.1rem);font-weight:500;opacity:0.7;}
+  .menu-link:hover, .menu-link:focus-visible, .menu-link.is-active{opacity:1;}
+  .menu-bottom{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;font-size:0.85rem;}
+  .menu-bottom .copy{opacity:0.6;}
+  .socials{display:flex;gap:20px;}
+  .socials a{text-decoration:none;opacity:0.75;color:var(--sb-bg);}
+  .socials a:hover, .socials a:focus-visible{opacity:1;}
+
+  /* ---------------- HERO ---------------- */
+  .hero{
+    position:relative;
+   
+    background:var(--purple-deep);
+    color:#fff;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    padding:72px var(--pad-x) 64px;
+  }
+  .hero__illustration{
+    position:absolute;
+    top:-8%;
+    right:-6%;
+    width:min(58vw, 680px);
+    aspect-ratio:1/1.05;
+    opacity:0.9;
+  }
+  .hero__illustration svg{width:100%;height:100%;}
+  .hero__kicker{
+    font-size:14px;
+    color:#C9B6E8;
+    margin-bottom:18px;
+    max-width:520px;
+  }
+  .hero__title{
+    font-size:clamp(2.4rem, 6vw, 4.6rem);
+    font-weight:600;
+    line-height:1.04;
+    max-width:none;
+    letter-spacing:-0.01em;
+  }
+  .hero__meta{
+    display:flex;
+    gap:40px;
+    margin-top:40px;
+    padding-top:24px;
+    border-top:1px solid rgba(255,255,255,0.2);
+    flex-wrap:wrap;
+  }
+  .hero__meta div{max-width:220px;}
+  .hero__meta span{
+    display:block;
+    font-size:12px;
+    color:#C9B6E8;
+    margin-bottom:6px;
+  }
+  .hero__meta strong{
+    font-family:'Sora', sans-serif;
+    font-weight:500;
+    font-size:15px;
+  }
+  .hero__logo{
+    position:absolute;
+    bottom:40px; left:var(--pad-x);
+    font-family:'Sora', sans-serif;
+    font-size:13px;
+    color:#C9B6E8;
+  }
+
+  /* ---------------- MODULE ---------------- */
+  .motion-module{
+    padding:96px var(--pad-x) 40px;
+    border-bottom:1px solid var(--line);
+  }
+  .motion-module:last-of-type{border-bottom:none;}
+
+  .motion-module__header{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:var(--gutter);
+    align-items:start;
+    max-width:var(--max);
+    margin:0 auto 64px;
+  }
+  .motion-module__eyebrow{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-bottom:16px;
+  }
+  .motion-module__title{
+    font-size:clamp(1.6rem, 3vw, 2.4rem);
+    font-weight:600;
+    max-width:12ch;
+  }
+  .motion-module__intro{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:46ch;
+    align-self:end;
+  }
+  .motion-module__frame{
+    width:100%;
+    aspect-ratio:4/3;
+    border:1px solid var(--line);
+    border-radius:6px;
+    overflow:hidden;
+    position:relative;
+    background:#EFEDE8;
+  }
+  .motion-module__frame svg{width:100%;height:100%;}
+
+  /* ---------------- CHARACTER DESIGN (composition en escalier) ---------------- */
+  .character-collage{
+    max-width:var(--max);
+    margin:0 auto 72px;
+    display:flex;
+    flex-direction:column;
+    gap:36px;
+  }
+  .character-collage__row{
+    display:flex;
+    align-items:center;
+    gap:18px;
+  }
+  .character-collage__row--illustrations{justify-content:flex-end;}
+  .character-collage__row--characters{justify-content:flex-start;}
+
+  .character-collage__frame{
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:#fff;
+    overflow:hidden;
+    flex-shrink:0;
+  }
+  .character-collage__frame svg,
+  .character-collage__frame img{width:100%;height:100%;object-fit:cover;}
+  .character-collage__row--illustrations .character-collage__frame{
+    width:clamp(200px, 26vw, 320px);
+    aspect-ratio:1/1;
+  }
+  .character-collage__row--characters .character-collage__frame{
+    width:clamp(260px, 34vw, 420px);
+    aspect-ratio:4/3.2;
+  }
+  .character-collage__label{
+    font-size:13px;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+
+  @media (max-width:820px){
+    .motion-module__header{grid-template-columns:1fr;}
+    .character-collage__row,
+    .character-collage__row--illustrations,
+    .character-collage__row--characters{
+      justify-content:center;
+      flex-direction:column;
+      gap:12px;
+    }
+    .character-collage__row--illustrations .character-collage__frame,
+    .character-collage__row--characters .character-collage__frame{
+      width:min(80vw, 320px);
+    }
+  }
+
+  /* ---------------- STYLE FRAME CAROUSEL (auto-scroll en boucle) ---------------- */
+  @keyframes style-frame-scroll{
+    0%{transform:translateX(0);}
+    100%{transform:translateX(-50%);}
+  }
+  .style-frame{
+    max-width:var(--max);
+    margin:0 auto;
+  }
+  .style-frame__viewport{
+    position:relative;
+    overflow:hidden;
+  }
+  .style-frame__viewport::before,
+  .style-frame__viewport::after{
+    content:"";
+    position:absolute;
+    top:0; bottom:0;
+    width:min(120px, 10vw);
+    z-index:2;
+    pointer-events:none;
+  }
+  .style-frame__viewport::before{
+    left:0;
+    background:linear-gradient(to right, var(--bg) 0%, rgba(255,255,255,0) 100%);
+  }
+  .style-frame__viewport::after{
+    right:0;
+    background:linear-gradient(to left, var(--bg) 0%, rgba(255,255,255,0) 100%);
+  }
+  .style-frame__track{
+    display:flex;
+    width:max-content;
+    gap:16px;
+    animation:style-frame-scroll 30s linear infinite;
+  }
+  .style-frame__viewport:hover .style-frame__track{
+    animation-play-state:paused;
+  }
+  .style-frame__item{
+    flex:0 0 320px;
+    aspect-ratio:16/10;
+    border-radius:4px;
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .style-frame__item svg,
+  .style-frame__item img{width:100%;height:100%;object-fit:cover;}
+  .style-frame__footer{
+    margin-top:18px;
+  }
+  .style-frame__label{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .style-frame__track{animation:none;overflow-x:auto;}
+  }
+
+  /* ---------------- VIDEO ---------------- */
+  .video-frame{
+    max-width:var(--max);
+    margin:56px auto 0;
+    aspect-ratio:16/9;
+    max-height:70vh;
+    background:var(--ink);
+    border-radius:6px;
+    position:relative;
+    overflow:hidden;
+  }
+  .video-frame video{
+    width:100%; height:100%; object-fit:cover;
+    position:absolute; inset:0;
+  }
+  .video-frame__link{
+    display:inline-block;
+    margin-top:20px;
+    font-size:14px;
+    color:var(--purple);
+    text-decoration:none;
+    border-bottom:1px solid var(--purple);
+    padding-bottom:1px;
+  }
+  .video-frame__link:hover{color:var(--purple-deep);border-color:var(--purple-deep);}
+
+  /* ---------------- FOOTER (placeholder) ---------------- */
+  .project-footer{
+    padding:64px var(--pad-x) 96px;
+    text-align:center;
+    font-size:14px;
+    color:var(--ink-soft);
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:16px 40px;
+  }
+  .project-footer a:nth-child(2){margin-left:auto}
+  .project-footer a{
+    color:var(--purple);
+    text-decoration:none;
+    border-bottom:1px solid var(--purple);
+  }
+
+  /* =============================================
+     FUSION : film continu + timeline
+     Les 3 projets s'enchaînent dans une seule page.
+     La timeline fixe en bas sert de navigation.
+  ============================================= */
+  :root{ --tl-h:112px; }
+  body{ padding-bottom:calc(var(--tl-h) + 24px); }
+
+  .proj{position:relative;}
+  .proj .hero{background:var(--hc, var(--purple-deep));}
+  .proj .hero__kicker,
+  .proj .hero__meta span,
+  .proj .hero__logo{color:var(--hk, #C9B6E8);}
+
+  /* Titre : les lettres montent une à une */
+  .hero__title .w{display:inline-block;white-space:nowrap;}
+  .hero__title .ch{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.12em;margin-bottom:-.12em;}
+  .hero__title .ch > i{display:inline-block;font-style:normal;}
+  .hero__title.kinetic:not(.in) .ch > i{transform:translateY(108%);}
+  .hero__title.kinetic.in .ch > i{
+    animation:title-rise .8s cubic-bezier(.2,.8,.2,1) both;
+    animation-delay:calc(var(--i) * 22ms);
+  }
+  @keyframes title-rise{from{transform:translateY(108%);}to{transform:none;}}
+
+  /* Pastilles du hero qui dérivent au défilement */
+  .hero__illustration circle{will-change:transform;}
+
+  /* Vignettes provisoires (projets 2 et 3) */
+  .style-frame__item.ph{display:grid;place-items:center;font-size:13px;color:#1b1426;}
+
+  /* Timeline */
+  .tl{
+    position:fixed;
+    left:var(--sidebar-w); right:0; bottom:0;
+    z-index:45;
+    display:grid;
+    gap:8px;
+    padding:10px var(--gutter) calc(12px + env(safe-area-inset-bottom, 0px));
+    background:rgba(255,255,255,0.94);
+    -webkit-backdrop-filter:blur(8px);
+    backdrop-filter:blur(8px);
+    border-top:1px solid var(--line);
+    font-family:'Work Sans', sans-serif;
+  }
+  .tl-info{display:flex;justify-content:space-between;align-items:baseline;gap:16px;font-size:12px;color:var(--ink-soft);}
+  .tl-info b{color:var(--ink);font-weight:600;}
+  .tl-info .right{display:flex;gap:16px;align-items:baseline;white-space:nowrap;}
+  .tl-info .tc{font-family:ui-monospace, Menlo, Consolas, monospace;font-variant-numeric:tabular-nums;color:var(--red);}
+  .tl-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;}
+  .tl-jump{
+    all:unset;
+    cursor:pointer;
+    width:36px; height:36px;
+    display:grid; place-items:center;
+    border:1px solid var(--line);
+    border-radius:4px;
+    font-size:16px;
+    color:var(--ink);
+  }
+  .tl-jump:hover{border-color:var(--red);color:var(--red);}
+  .tl-jump:focus-visible,
+  .tl-clip:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
+  .tl-track{position:relative;height:48px;touch-action:none;cursor:ew-resize;user-select:none;}
+  .tl-ruler{
+    position:absolute; inset:0 0 auto 0; height:8px;
+    background:repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 28px);
+  }
+  .tl-clips{position:absolute;inset:12px 0 0 0;}
+  .tl-clip{
+    all:unset;
+    box-sizing:border-box;
+    position:absolute; top:0; height:36px;
+    display:flex; align-items:center; gap:6px;
+    padding:0 8px;
+    overflow:hidden;
+    white-space:nowrap;
+    cursor:pointer;
+    background:var(--c);
+    border:1px solid rgba(0,0,0,0.14);
+    border-radius:3px;
+    color:#fff;
+    font-size:12px; font-weight:600;
+    opacity:.5;
+    transition:opacity .25s ease;
+  }
+  .tl-clip.on{opacity:1;border-color:var(--ink);}
+  .tl-clip em{font-style:normal;font-family:ui-monospace, Menlo, Consolas, monospace;font-weight:400;opacity:.85;}
+  .tl-head{position:absolute;top:0;bottom:0;width:0;pointer-events:none;z-index:2;}
+  .tl-head::before{content:"";position:absolute;left:-1px;top:4px;bottom:-2px;width:2px;background:var(--red);}
+  .tl-head::after{content:"";position:absolute;left:-6px;top:-2px;border-top:8px solid var(--red);border-left:6px solid transparent;border-right:6px solid transparent;}
+
+  @media (max-width:820px){
+    :root{--tl-h:116px;}
+    .tl-info .hint{display:none;}
+    .tl-clip{padding:0 6px;}
+    .tl-clip .nm{display:none;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .hero__title.kinetic:not(.in) .ch > i{transform:none;}
+    .hero__title.kinetic.in .ch > i{animation:none;}
+    .tl-clip{transition:none;}
+  }
+</style>
+<link rel="stylesheet" href="tv-noise.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Aller au contenu</a>
+
+<aside class="sidebar">
+  <button class="hamburger" id="menuToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="menuOverlay">
+    <span></span><span></span><span></span>
+  </button>
+  <a class="mid-stack" href="index.html" aria-label="Retour à l'accueil">
+    <span class="vlabel">PORTFOLIO</span>
+    <span class="vname">MANEL BEN HALIMA</span>
+  </a>
+  <span class="year">© 2026</span>
+</aside>
+
+<nav class="menu-overlay" id="menuOverlay" aria-hidden="true">
+  <div class="menu-top">
+    <span class="brand">Manel Ben Halima</span>
+    <button class="menu-close" id="menuClose">FERMER</button>
+  </div>
+  <div class="menu-nav">
+    <a href="index.html#apropos" class="menu-link"><span class="idx">01</span>À propos</a>
+    <a href="index.html#travaux" class="menu-link"><span class="idx">02</span>Travaux</a>
+    <a href="index.html#contact" class="menu-link"><span class="idx">03</span>Contact</a>
+  </div>
+  <div class="menu-bottom">
+    <span class="copy">Basée à Montréal</span>
+    <div class="socials">
+      <a href="https://www.linkedin.com/in/manel-ben-halima" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://www.behance.net/mmanelben" target="_blank" rel="noopener">Behance</a>
+    </div>
+  </div>
+</nav>
+
+<div id="main">
+
+<article class="proj" id="djerba" data-short="Djerba" data-title="Sommet de la Francophonie de Djerba 2022" style="--hc:#3E1F63;--hk:#C9B6E8">
+<section class="hero">
+  <div class="hero__illustration">
+    <!-- Placeholder — remplacer par le SVG signature (illustration "main" façon circuit) -->
+    <svg viewBox="0 0 400 420" fill="none">
+      <circle cx="330" cy="40" r="10" fill="#F5C242"/>
+      <circle cx="120" cy="90" r="7" fill="#E4483A"/>
+      <circle cx="260" cy="150" r="14" fill="#6FA84B"/>
+    </svg>
+  </div>
+
+  <p class="hero__kicker">Motion design &amp; identité animée</p>
+  <h1 class="hero__title">Sommet de la Francophonie<br>de Djerba 2022</h1>
+
+  <div class="hero__meta">
+    <div>
+      <span>Client</span>
+      <strong>Comité d'organisation du XVIIIᵉ Sommet de la Francophonie</strong>
+    </div>
+    <div>
+      <span>Rôle</span>
+      <strong>Motion design, character design, illustration</strong>
+    </div>
+    <div>
+      <span>Livrables</span>
+      <strong>Vidéo explicative, série 2D animée</strong>
+    </div>
+  </div>
+
+  <div class="hero__logo">Djerbä — XVIIIᵉ Sommet de la Francophonie 2022</div>
+</section>
+
+<!-- ============ MODULE 2 — VIDÉO 2D ============ -->
+<section class="motion-module" id="video-2d">
+
+
+  <div class="character-collage">
+    <div class="character-collage__row character-collage__row--illustrations">
+      <span class="character-collage__label">+30 illustrations</span>
+      <div class="character-collage__frame">
+        <img src="images/motion-p1-img01.png" alt="Illustration — Sommet de la Francophonie de Djerba 2022" loading="lazy">
+      </div>
+    </div>
+    <div class="character-collage__row character-collage__row--characters">
+      <div class="character-collage__frame">
+        <img src="images/motion-p1-img02.png" alt="Character design — personnages du Sommet de la Francophonie de Djerba 2022" loading="lazy">
+      </div>
+      <span class="character-collage__label">Character design</span>
+    </div>
+  </div>
+
+  <div class="style-frame">
+    <div class="style-frame__viewport">
+      <div class="style-frame__track">
+        <div class="style-frame__item"><img src="images/motion-p1-styleFrame01.png" alt="Style frame 01 — Sommet de la Francophonie de Djerba 2022" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p1-styleFrame02.png" alt="Style frame 02 — Sommet de la Francophonie de Djerba 2022" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p1-styleFrame03.png" alt="Style frame 03 — Sommet de la Francophonie de Djerba 2022" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p1-styleFrame04.png" alt="Style frame 04 — Sommet de la Francophonie de Djerba 2022" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p1-styleFrame05.png" alt="Style frame 05 — Sommet de la Francophonie de Djerba 2022" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p1-styleFrame06.png" alt="Style frame 06 — Sommet de la Francophonie de Djerba 2022" loading="lazy"></div>
+        <!-- copie des vignettes pour la boucle continue (translateX -50%) -->
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p1-styleFrame01.png" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p1-styleFrame02.png" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p1-styleFrame03.png" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p1-styleFrame04.png" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p1-styleFrame05.png" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p1-styleFrame06.png" alt="" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="style-frame__footer">
+      <span class="style-frame__label">Style Frame</span>
+    </div>
+  </div>
+
+  <div class="video-frame">
+    <!-- Remplacer src par le fichier réel. autoplay exige muted pour démarrer sans interaction -->
+    <video autoplay muted loop playsinline controls>
+      <source src="assets/videos/djerba-2d.mp4" type="video/mp4">
+    </video>
+  </div>
+  <a class="video-frame__link" href="#" target="_blank" rel="noopener">Voir la vidéo complète</a>
+</section>
+
+<!-- ============ MODULE 1 — VIDÉO EXPLICATIVE ============ -->
+<section class="motion-module" id="video-explicative">
+  <div class="motion-module__header">
+    <div>
+      <p class="motion-module__eyebrow">Vidéo explicative</p>
+      <h2 class="motion-module__title">Accréditation presse</h2>
+    </div>
+    <p class="motion-module__intro">
+      Une vidéo pédagogique pour accompagner les journalistes dans leur
+      demande d'accréditation, du premier réflexe (chercher « Sommet de la
+      Francophonie de Djerba 2022 » sur Google) jusqu'à la confirmation
+      de leur dossier sur la plateforme officielle.
+    </p>
+  </div>
+
+  <div class="style-frame">
+    <div class="style-frame__viewport">
+      <div class="style-frame__track">
+        <div class="style-frame__item"><img src="images/motion-p1-1-styleFrame01.webp" alt="Style frame 01 — Laptop — accréditations médias" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p1-1-styleFrame02.webp" alt="Style frame 02 — Recherche Google" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p1-1-styleFrame03.webp" alt="Style frame 03 — « Vous êtes journaliste ? »" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p1-1-styleFrame04.webp" alt="Style frame 04 — Formulaire d'accréditation" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p1-1-styleFrame05.webp" alt="Style frame 05 — Étape 2 — Hébergement" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p1-1-styleFrame06.webp" alt="Style frame 06 — Confirmation d'envoi" loading="lazy"></div>
+        <!-- copie des vignettes pour la boucle continue (translateX -50%) -->
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p1-1-styleFrame01.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p1-1-styleFrame02.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p1-1-styleFrame03.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p1-1-styleFrame04.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p1-1-styleFrame05.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p1-1-styleFrame06.webp" alt="" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="style-frame__footer">
+      <span class="style-frame__label">Style Frame</span>
+    </div>
+  </div>
+
+  <div class="video-frame">
+    <!-- Remplacer src par le fichier réel. autoplay exige muted pour démarrer sans interaction -->
+    <video autoplay muted loop playsinline controls>
+      <source src="assets/videos/djerba-accreditation.mp4" type="video/mp4">
+    </video>
+  </div>
+  <a class="video-frame__link" href="#" target="_blank" rel="noopener">Voir la vidéo complète</a>
+</section>
+
+</article>
+
+<article class="proj" id="med" data-short="Med" data-title="Projet Med" style="--hc:#14405A;--hk:rgba(255,255,255,0.78)">
+<section class="hero">
+  <div class="hero__illustration">
+    <svg viewBox="0 0 400 420" fill="none">
+      <circle cx="330" cy="40" r="10" fill="#F5C242"/>
+      <circle cx="120" cy="90" r="7" fill="#E4483A"/>
+      <circle cx="260" cy="150" r="14" fill="#6FA84B"/>
+    </svg>
+  </div>
+  <p class="hero__kicker">Motion design</p>
+  <h1 class="hero__title">Projet Med</h1>
+  <div class="hero__meta">
+    <div><span>Client</span><strong>À renseigner</strong></div>
+    <div><span>Rôle</span><strong>Motion design</strong></div>
+    <div><span>Livrables</span><strong>Vidéo animée</strong></div>
+  </div>
+</section>
+<section class="motion-module" id="med-video">
+  <div class="motion-module__header">
+    <div>
+      <p class="motion-module__eyebrow">Vidéo</p>
+      <h2 class="motion-module__title">Titre du livrable</h2>
+    </div>
+    <p class="motion-module__intro">Texte de présentation du livrable.</p>
+  </div>
+  <div class="style-frame">
+    <div class="style-frame__viewport">
+      <div class="style-frame__track">
+        <div class="style-frame__item"><img src="images/motion-p2-styleFrame01.webp" alt="Style frame 01 — Projet Med" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p2-styleFrame02.webp" alt="Style frame 02 — Projet Med" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p2-styleFrame03.webp" alt="Style frame 03 — Projet Med" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p2-styleFrame04.webp" alt="Style frame 04 — Projet Med" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p2-styleFrame05.webp" alt="Style frame 05 — Projet Med" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p2-styleFrame06.webp" alt="Style frame 06 — Projet Med" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p2-styleFrame07.webp" alt="Style frame 07 — Projet Med" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p2-styleFrame08.webp" alt="Style frame 08 — Projet Med" loading="lazy"></div>
+        <!-- copie des vignettes pour la boucle continue (translateX -50%) -->
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p2-styleFrame01.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p2-styleFrame02.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p2-styleFrame03.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p2-styleFrame04.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p2-styleFrame05.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p2-styleFrame06.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p2-styleFrame07.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p2-styleFrame08.webp" alt="" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="style-frame__footer"><span class="style-frame__label">Style Frame</span></div></div>
+  <div class="video-frame">
+    <video autoplay muted loop playsinline controls>
+      <source src="assets/videos/med.mp4" type="video/mp4">
+    </video>
+  </div>
+  <a class="video-frame__link" href="#" target="_blank" rel="noopener">Voir la vidéo complète</a>
+</section>
+</article>
+
+<article class="proj" id="association" data-short="Association" data-title="Projet Association" style="--hc:#6B2F14;--hk:rgba(255,255,255,0.78)">
+<section class="hero">
+  <div class="hero__illustration">
+    <svg viewBox="0 0 400 420" fill="none">
+      <circle cx="330" cy="40" r="10" fill="#F5C242"/>
+      <circle cx="120" cy="90" r="7" fill="#E4483A"/>
+      <circle cx="260" cy="150" r="14" fill="#6FA84B"/>
+    </svg>
+  </div>
+  <p class="hero__kicker">Motion design</p>
+  <h1 class="hero__title">Projet Association</h1>
+  <div class="hero__meta">
+    <div><span>Client</span><strong>À renseigner</strong></div>
+    <div><span>Rôle</span><strong>Motion design</strong></div>
+    <div><span>Livrables</span><strong>Vidéo animée</strong></div>
+  </div>
+</section>
+<section class="motion-module" id="association-video">
+  <div class="motion-module__header">
+    <div>
+      <p class="motion-module__eyebrow">Vidéo</p>
+      <h2 class="motion-module__title">Titre du livrable</h2>
+    </div>
+    <p class="motion-module__intro">Texte de présentation du livrable.</p>
+  </div>
+  <div class="style-frame">
+    <div class="style-frame__viewport">
+      <div class="style-frame__track">
+        <div class="style-frame__item"><img src="images/motion-p3-styleFrame01.webp" alt="Style frame 01 — Projet Association" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p3-styleFrame02.webp" alt="Style frame 02 — Projet Association" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p3-styleFrame03.webp" alt="Style frame 03 — Projet Association" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p3-styleFrame04.webp" alt="Style frame 04 — Projet Association" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p3-styleFrame05.webp" alt="Style frame 05 — Projet Association" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p3-styleFrame06.webp" alt="Style frame 06 — Projet Association" loading="lazy"></div>
+        <div class="style-frame__item"><img src="images/motion-p3-styleFrame07.webp" alt="Style frame 07 — Projet Association" loading="lazy"></div>
+        <!-- copie des vignettes pour la boucle continue (translateX -50%) -->
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p3-styleFrame01.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p3-styleFrame02.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p3-styleFrame03.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p3-styleFrame04.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p3-styleFrame05.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p3-styleFrame06.webp" alt="" loading="lazy"></div>
+        <div class="style-frame__item" aria-hidden="true"><img src="images/motion-p3-styleFrame07.webp" alt="" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="style-frame__footer"><span class="style-frame__label">Style Frame</span></div></div>
+  <div class="video-frame">
+    <video autoplay muted loop playsinline controls>
+      <source src="assets/videos/association.mp4" type="video/mp4">
+    </video>
+  </div>
+  <a class="video-frame__link" href="#" target="_blank" rel="noopener">Voir la vidéo complète</a>
+</section>
+</article>
+
+
+</div>
+
+<!-- ===== Timeline des projets ===== -->
+<footer class="tl" aria-label="Timeline des projets">
+  <div class="tl-info">
+    <span id="tlLabel"></span>
+    <span class="right"><span class="hint">Fais glisser la tête de lecture</span><span class="tc" id="tlTc">00:00:00</span></span>
+  </div>
+  <div class="tl-row">
+    <button class="tl-jump" id="tlPrev" type="button" aria-label="Projet précédent">←</button>
+    <div class="tl-track" id="tlTrack">
+      <div class="tl-ruler"></div>
+      <div class="tl-clips" id="tlClips"></div>
+      <div class="tl-head" id="tlHead"></div>
+    </div>
+    <button class="tl-jump" id="tlNext" type="button" aria-label="Projet suivant">→</button>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var arts = Array.prototype.slice.call(document.querySelectorAll('.proj'));
+
+    /* ---------- Titres : découpe en lettres (les <br> sont conservés) ---------- */
+    var titles = Array.prototype.slice.call(document.querySelectorAll('.hero__title'));
+    function splitTitle(h) {
+      h.setAttribute('aria-label', h.textContent.replace(/\s+/g, ' ').trim());
+      var n = 0;
+      Array.prototype.slice.call(h.childNodes).forEach(function (node) {
+        if (node.nodeType !== 3) return;
+        var frag = document.createDocumentFragment();
+        var words = node.textContent.split(' ').filter(Boolean);
+        words.forEach(function (word, wi) {
+          var w = document.createElement('span');
+          w.className = 'w';
+          w.setAttribute('aria-hidden', 'true');
+          word.split('').forEach(function (c) {
+            var ch = document.createElement('span');
+            ch.className = 'ch';
+            var i = document.createElement('i');
+            i.textContent = c;
+            i.style.setProperty('--i', n++);
+            ch.appendChild(i);
+            w.appendChild(ch);
+          });
+          n++;
+          frag.appendChild(w);
+          if (wi < words.length - 1) frag.appendChild(document.createTextNode(' '));
+        });
+        h.replaceChild(frag, node);
+      });
+      h.classList.add('kinetic');
+    }
+    if (!reduce) {
+      titles.forEach(splitTitle);
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+          });
+        }, { threshold: 0.2 });
+        titles.forEach(function (t) { io.observe(t); });
+      } else {
+        titles.forEach(function (t) { t.classList.add('in'); });
+      }
+    }
+
+    /* ---------- Timeline ---------- */
+    var track = document.getElementById('tlTrack');
+    var clipsEl = document.getElementById('tlClips');
+    var head = document.getElementById('tlHead');
+    var tcEl = document.getElementById('tlTc');
+    var labelEl = document.getElementById('tlLabel');
+    var clipEls = [], tops = [], hts = [], docH = 1, current = -1;
+
+    arts.forEach(function (a, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tl-clip';
+      b.style.setProperty('--c', getComputedStyle(a).getPropertyValue('--hc').trim() || '#3E1F63');
+      b.setAttribute('aria-label', 'Aller à ' + a.getAttribute('data-title'));
+      b.innerHTML = '<em>0' + (i + 1) + '</em><span class="nm">' + a.getAttribute('data-short') + '</span>';
+      clipsEl.appendChild(b);
+      clipEls.push(b);
+    });
+
+    function pad(n, l) { n = String(n); while (n.length < l) n = '0' + n; return n; }
+    function refY() { return window.innerHeight * 0.35; }
+
+    function measure() {
+      docH = document.documentElement.scrollHeight;
+      tops = arts.map(function (a) { return a.offsetTop; });
+      hts = arts.map(function (a) { return a.offsetHeight; });
+      clipEls.forEach(function (b, i) {
+        b.style.left = (tops[i] / docH * 100) + '%';
+        b.style.width = 'calc(' + (hts[i] / docH * 100) + '% - 3px)';
+      });
+      update();
+    }
+
+    function update() {
+      var sy = window.scrollY, y = sy + refY();
+      var frac = Math.max(0, Math.min(1, y / docH));
+      head.style.left = (frac * 100) + '%';
+
+      var total = Math.floor(frac * 90 * 25);
+      tcEl.textContent = pad(Math.floor(total / 1500), 2) + ':' + pad(Math.floor(total / 25) % 60, 2) + ':' + pad(total % 25, 2);
+
+      var idx = 0;
+      for (var i = 0; i < tops.length; i++) { if (y >= tops[i]) idx = i; }
+      if (idx !== current) {
+        current = idx;
+        clipEls.forEach(function (b, k) { b.classList.toggle('on', k === idx); });
+        labelEl.innerHTML = '<b>0' + (idx + 1) + ' / 0' + arts.length + '</b> · ' + arts[idx].getAttribute('data-title');
+      }
+
+      if (!reduce) {
+        arts.forEach(function (a, k) {
+          var p = Math.max(-0.2, Math.min(1.2, (sy - tops[k]) / Math.max(1, hts[k])));
+          var d = a.querySelectorAll('.hero__illustration circle');
+          for (var j = 0; j < d.length; j++) {
+            var s = [0.12, -0.08, 0.2][j % 3];
+            d[j].style.transform = 'translateY(' + (p * 900 * s) + 'px)';
+          }
+        });
+      }
+    }
+
+    var ticking = false;
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () { ticking = false; update(); });
+    }, { passive: true });
+    window.addEventListener('resize', measure);
+    window.addEventListener('load', measure);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+    if ('ResizeObserver' in window) new ResizeObserver(measure).observe(document.body);
+
+    /* Le CSS a scroll-behavior:smooth : on force 'instant' pour que le glissé suive le doigt */
+    function scrubTo(clientX) {
+      var r = track.getBoundingClientRect();
+      var frac = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+      window.scrollTo({ top: frac * docH - refY(), behavior: 'instant' });
+    }
+    function goProject(i) {
+      i = (i + arts.length) % arts.length;
+      window.scrollTo({ top: tops[i], behavior: reduce ? 'auto' : 'smooth' });
+    }
+
+    var down = false, dragged = false, startX = 0, downClip = -1;
+    track.addEventListener('pointerdown', function (e) {
+      down = true; dragged = false; startX = e.clientX;
+      var c = e.target.closest('.tl-clip');
+      downClip = c ? clipEls.indexOf(c) : -1;
+      track.setPointerCapture(e.pointerId);
+    });
+    track.addEventListener('pointermove', function (e) {
+      if (!down) return;
+      if (Math.abs(e.clientX - startX) > 4) dragged = true;
+      if (dragged) scrubTo(e.clientX);
+    });
+    track.addEventListener('pointerup', function (e) {
+      if (!down) return;
+      down = false;
+      if (!dragged) { if (downClip > -1) goProject(downClip); else scrubTo(e.clientX); }
+    });
+    track.addEventListener('pointercancel', function () { down = false; });
+    clipEls.forEach(function (b, i) {
+      b.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goProject(i); }
+      });
+    });
+    document.getElementById('tlPrev').addEventListener('click', function () { goProject(current - 1); });
+    document.getElementById('tlNext').addEventListener('click', function () { goProject(current + 1); });
+
+    measure();
+  })();
+</script>
+
+<script>
+  (function () {
+    var toggle = document.getElementById('menuToggle');
+    var closeBtn = document.getElementById('menuClose');
+    var overlay = document.getElementById('menuOverlay');
+
+    function openMenu() {
+      overlay.classList.add('is-open');
+      toggle.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+    function closeMenu() {
+      overlay.classList.remove('is-open');
+      toggle.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    toggle.addEventListener('click', function () {
+      overlay.classList.contains('is-open') ? closeMenu() : openMenu();
+    });
+    closeBtn.addEventListener('click', closeMenu);
+  })();
+</script>
+
+<script src="tv-noise.js"></script>
+</body>
+</html>

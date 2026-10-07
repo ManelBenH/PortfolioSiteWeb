@@ -397,24 +397,23 @@
   .contact-links a:hover, .contact-links a:focus-visible { border-color: var(--accent); color: var(--accent); }
 
   /* ---------- Footer ---------- */
-  .site-footer { background: var(--bg-raised); display: flex; flex-direction: column; justify-content: space-between; padding: 72px 6vw 40px; border-bottom: none; }
-  .footer-top { display: flex; justify-content: flex-end; }
+  .site-footer { background: var(--bg-raised); display: flex; flex-direction: column; justify-content: space-between; padding: 100px 6vw; border-bottom: none; }
+  .footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; flex-wrap: wrap; }
   .footer-cols { display: flex; gap: 56px; flex-wrap: wrap; }
   .footer-col { display: flex; flex-direction: column; gap: 10px; }
   .col-label { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 4px; }
   .footer-col a { text-decoration: none; font-size: 0.95rem; }
   .footer-col a:hover, .footer-col a:focus-visible { color: var(--accent); }
-  .footer-credit { font-size: 0.8rem; color: var(--ink-soft); text-align: right; margin-top: 28px; }
+  .footer-credit { font-size: 0.8rem; color: var(--ink-soft); text-align: left; margin-top: 16px; }
   .footer-giant {
     font-family: 'Inter', var(--font-display);
     font-weight: 900;
     font-size: clamp(2.2rem, 10vw, 7.5rem);
     line-height: 0.9;
-    letter-spacing: -0.045em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--accent);
-    margin-top: 0;
-    margin-bottom: clamp(24px, 6vw, 80px);
+    margin: 0;
     white-space: nowrap;
   }
 
@@ -557,7 +556,7 @@
 
         <div class="accordion" id="accMotion">
 
-          <a href="motion-P1.html" class="acc-panel" data-project="motion-01">
+          <a href="motion.html#djerba" class="acc-panel" data-project="motion-01">
             <div class="acc-art acc-art--reveal">
               <div class="acc-art__photo" style="background-image: url('images/motion-image-de-fond-sommet.webp');"></div>
               <div class="acc-art__content">
@@ -572,7 +571,7 @@
             </div>
           </a>
 
-          <a href="projets/motion-02.html" class="acc-panel" data-project="motion-02">
+          <a href="motion.html#med" class="acc-panel" data-project="motion-02">
             <div class="acc-art acc-art--reveal">
               <div class="acc-art__photo" style="background-image: url('images/motion-image-de-fond-med.webp');"></div>
               <div class="acc-art__content">
@@ -587,7 +586,7 @@
             </div>
           </a>
 
-          <a href="projets/motion-03.html" class="acc-panel" data-project="motion-03">
+          <a href="motion.html#association" class="acc-panel" data-project="motion-03">
             <div class="acc-art acc-art--reveal">
               <div class="acc-art__photo" style="background-image: url('images/motion-image-de-fond-association.webp');"></div>
               <div class="acc-art__content">
@@ -662,6 +661,10 @@
     <footer class="site-footer">
       <div class="footer-head">
         <div class="footer-top">
+          <div class="footer-brand">
+            <div class="footer-giant">MERCI</div>
+            <div class="footer-credit">Conçu &amp; développé par Manel Ben Halima — © 2026</div>
+          </div>
           <div class="footer-cols">
             <div class="footer-col">
               <span class="col-label">Menu</span>
@@ -681,9 +684,7 @@
             </div>
           </div>
         </div>
-        <div class="footer-credit">Conçu &amp; développé par Manel Ben Halima — © 2026</div>
       </div>
-      <div class="footer-giant">MERCI</div>
     </footer>
 
   </main>
